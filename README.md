@@ -13,6 +13,8 @@ assets/torsion.js   RNA-TorsionBERT lab: rebuild a backbone from torsion angles 
 assets/torsion-data.js  tRNA 1EHZ backbone atoms, torsions, mean bond lengths/angles
 assets/works.js     figure switchers + lightbox for the thesis works
 assets/img/         figures from the EvryRNA repos (resized for the web)
+assets/projects.js  tutorials, projects, teaching demo (2D superposition), publication sorting
+assets/media/       project/tutorial previews (GIFs converted to MP4 + poster frames)
 .github/workflows/pages.yml   auto-deploy on push to main
 ```
 
@@ -35,3 +37,7 @@ python3 -m http.server 8000
 - Text lives in `index.html`.
 - Project GIFs: put files in `assets/img/` and replace each `<div class="ph">…</div>` with `<img src="assets/img/name.gif" alt="…">`.
 - Counters animate from the `data-count` attribute on stat numbers; keep it in sync with the text.
+
+## Updating citation numbers
+
+The Research stats and per-paper citation counts are static, copied from Google Scholar on 1 October 2026. Update them in `index.html` (search for `data-count` and `citations`).

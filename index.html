@@ -36,6 +36,7 @@
         <li><a href="#thesis">Thesis</a></li>
         <li><a href="#ai">AI lab</a></li>
         <li><a href="#research">Research</a></li>
+        <li><a href="#tutorials">Tutorials</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#projects">Projects</a></li>
         <li><a href="#contact">Contact</a></li>
@@ -67,7 +68,7 @@
     <div class="stats">
       <div class="stat reveal"><b data-count="8" data-suffix="+">8+</b><span>years of experience</span></div>
       <div class="stat reveal" style="--d:.08s"><b data-count="3">3</b><span>countries worked in</span></div>
-      <div class="stat reveal" style="--d:.16s"><b data-count="14">14</b><span>peer-reviewed publications</span></div>
+      <div class="stat reveal" style="--d:.16s"><b data-count="173">173</b><span>citations on Google Scholar</span></div>
       <div class="stat reveal" style="--d:.24s"><b>PhD</b><span>in RNA 3D structure prediction</span></div>
     </div>
   </header>
@@ -121,18 +122,18 @@
         <div class="loc">Lyon, FR</div>
       </article>
       <article class="job reveal">
-        <div class="when">2016 – 2019</div>
+        <div class="when">– 2025</div>
         <div>
           <h3>PhD Researcher</h3>
-          <div class="org">Example University · Laboratory of Synthetic Biology</div>
+          <div class="org">IBISC &amp; LISN · Université Paris-Saclay</div>
           <ul>
-            <li>Developed deep learning methods to predict and evaluate RNA 3D structures from sequence.</li>
-            <li>Presented at 9 international conferences, including 3 oral talks.</li>
-            <li>Supervised 5 master's students and taught practical lab classes.</li>
+            <li>Developed RNA-TorsionBERT, a language model that predicts RNA torsion angles from the sequence (Bioinformatics, 2025).</li>
+            <li>Built RNAdvisor for assessing RNA 3D model quality, and led two benchmarks of prediction methods, including AlphaFold 3.</li>
+            <li>Wrote an 11-part Medium series on RNA 3D structures and designed M2 projects for GENIOMHE students.</li>
           </ul>
           <div class="chips"><span class="chip">RNA 3D structure</span><span class="chip">Deep learning</span><span class="chip">Teaching</span></div>
         </div>
-        <div class="loc">Paris, FR</div>
+        <div class="loc">Île-de-France, FR</div>
       </article>
       <article class="job reveal">
         <div class="when">2015</div>
@@ -153,10 +154,10 @@
     <div class="sec-head reveal"><span class="tag" style="background:var(--g);color:var(--on-g)">G</span><h2>Education</h2></div>
     <div class="edu-grid">
       <article class="edu feature reveal">
-        <div class="yr">2016 – 2019</div>
-        <h3>PhD, Computational biology &amp; AI</h3>
-        <div class="school">Example University</div>
-        <p>Thesis: predicting RNA 3D structures with deep learning. <a href="#thesis" style="color:inherit;font-weight:600">Explore it in 3D ↓</a></p>
+        <div class="yr">2025</div>
+        <h3>PhD, deep learning for RNA 3D structures</h3>
+        <div class="school">Université Paris-Saclay · IBISC &amp; LISN</div>
+        <p>Thesis: computational methods based on deep learning for the prediction of RNA 3D structures. <a href="#thesis" style="color:inherit;font-weight:600">Explore it in 3D ↓</a></p>
       </article>
       <article class="edu reveal" style="--d:.1s">
         <div class="yr">2014 – 2016</div>
@@ -476,6 +477,7 @@
               <button class="chip-btn" type="button" id="rlMap">Reset map</button>
             </div>
             <p class="fine">Tabular Q-learning: α = 0.5, γ = 0.95, ε-greedy exploration decaying from 1 to 0.05. Green cells mean the agent expects reward there.</p>
+            <p class="fine">I’ve also applied RL to <a class="link" href="#projects">exploration bonuses and cache-friendly recommendation</a>.</p>
           </div>
         </div>
       </div>
@@ -483,44 +485,104 @@
   </section>
 
   <section class="block" id="research">
-    <div class="sec-head reveal"><span class="tag" style="background:var(--fg);color:var(--bg)" title="N: any base">N</span><h2>Research</h2><p class="sec-sub">Publications, conference talks and posters from my PhD and since.</p></div>
+    <div class="sec-head reveal"><span class="tag" style="background:var(--fg);color:var(--bg)" title="N: any base">N</span><h2>Research</h2><p class="sec-sub">Papers from my PhD on RNA 3D structure prediction, all as first author.</p></div>
     <div class="r-stats">
-      <div class="r-stat reveal"><b data-count="14">14</b><span>publications</span></div>
-      <div class="r-stat reveal" style="--d:.08s"><b data-count="6">6</b><span>as first author</span></div>
-      <div class="r-stat reveal" style="--d:.16s"><b data-count="420">420</b><span>citations</span></div>
-      <div class="r-stat reveal" style="--d:.24s"><b data-count="9">9</b><span>conference talks &amp; posters</span></div>
+      <div class="r-stat reveal"><b data-count="5">5</b><span>peer-reviewed papers</span></div>
+      <div class="r-stat reveal" style="--d:.08s"><b data-count="173">173</b><span>citations</span></div>
+      <div class="r-stat reveal" style="--d:.16s"><b data-count="5">5</b><span>h-index</span></div>
+      <div class="r-stat reveal" style="--d:.24s"><b data-count="4">4</b><span>i10-index</span></div>
     </div>
+    <p class="fine r-src">Source: <a class="link" href="https://scholar.google.com/citations?user=hvGvUwgAAAAJ&amp;hl=fr" target="_blank" rel="noopener">Google Scholar</a>, 1 October 2026.</p>
     <div class="r-grid">
       <div class="reveal">
-        <h3 class="sub">Selected publications</h3>
-        <input class="search" id="pubSearch" type="search" placeholder="Search titles, authors, venues…" aria-label="Search publications">
+        <h3 class="sub">Publications</h3>
+        <input class="search" id="pubSearch" type="search" placeholder="Search titles, venues…" aria-label="Search publications">
         <div class="filters" role="group" aria-label="Filter publications">
           <button type="button" data-f="all" aria-pressed="true">All</button>
           <button type="button" data-f="method" aria-pressed="false">Methods</button>
           <button type="button" data-f="benchmark" aria-pressed="false">Benchmarks</button>
+          <button type="button" data-f="tool" aria-pressed="false">Tools</button>
+          <button type="button" data-f="other" aria-pressed="false">Thesis &amp; preprint</button>
           <span class="count" id="pubCount" aria-live="polite"></span>
         </div>
+        <div class="sortrow"><span class="ctl-k">Sort by</span><div class="seg"><button type="button" data-sort="y" aria-pressed="true">Year</button><button type="button" data-sort="c" aria-pressed="false">Citations</button></div></div>
         <ul class="pubs" id="pubs">
-          <li class="pub" data-t="method"><span class="y">2025</span><div><p class="ttl">RNA-TorsionBERT: leveraging language models for RNA 3D torsion angles prediction</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge journal">METHOD</span><span class="venue">Bioinformatics 41(1), btaf004</span><a href="https://doi.org/10.1093/bioinformatics/btaf004" target="_blank" rel="noopener">DOI ↗</a><a href="#torsionbert">Demo ↑</a></div></div></li>
-          <li class="pub" data-t="benchmark"><span class="y">2025</span><div><p class="ttl">Has AlphaFold3 achieved success for RNA?</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge conf">BENCHMARK</span><span class="venue">Acta Crystallographica Section D 81(2)</span><a href="https://doi.org/10.1107/S2059798325000592" target="_blank" rel="noopener">DOI ↗</a></div></div></li>
-          <li class="pub" data-t="benchmark"><span class="y">2024</span><div><p class="ttl">State-of-the-RNArt: benchmarking current methods for RNA 3D structure prediction</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge conf">BENCHMARK</span><span class="venue">NAR Genomics and Bioinformatics 6(2), lqae048</span><a href="https://doi.org/10.1093/nargab/lqae048" target="_blank" rel="noopener">DOI ↗</a></div></div></li>
+          <li class="pub" data-t="tool" data-y="2025.9" data-c="0"><span class="y">2025</span><div><p class="ttl">RNAdvisor 2: A unified platform for RNA 3D model quality assessment using metrics, scoring functions, and meta-metrics</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge preprint">TOOL</span><span class="venue">Scientific Reports 15(1), 41487</span><a href="https://github.com/EvryRNA/rnadvisor" target="_blank" rel="noopener">Code ↗</a></div></div></li>
+          <li class="pub" data-t="other" data-y="2025.8" data-c="0"><span class="y">2025</span><div><p class="ttl">Computational methods based on deep learning for the prediction of RNA 3D structures</p><div class="au"><strong>Bernard C.</strong></div><div class="meta"><span class="badge thesis">PHD THESIS</span><span class="venue">Université Paris-Saclay</span><a href="#thesis">Explore ↑</a></div></div></li>
+          <li class="pub" data-t="benchmark" data-y="2025.2" data-c="76"><span class="y">2025</span><div><p class="ttl">Has AlphaFold3 achieved success for RNA?</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge conf">BENCHMARK</span><span class="venue">Acta Crystallographica Section D 81(2), 49–62</span><span>· 76 citations</span><a href="https://doi.org/10.1107/S2059798325000592" target="_blank" rel="noopener">DOI ↗</a><a href="#af3">More ↑</a></div></div></li>
+          <li class="pub" data-t="method" data-y="2025.1" data-c="18"><span class="y">2025</span><div><p class="ttl">RNA-TorsionBERT: leveraging language models for RNA 3D torsion angles prediction</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge journal">METHOD</span><span class="venue">Bioinformatics 41(1), btaf004</span><span>· 18 citations</span><a href="https://doi.org/10.1093/bioinformatics/btaf004" target="_blank" rel="noopener">DOI ↗</a><a href="#torsionbert">Demo ↑</a></div></div></li>
+          <li class="pub" data-t="other" data-y="2024.5" data-c="9"><span class="y">2024</span><div><p class="ttl">Has AlphaFold 3 reached its success for RNAs?</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge pre">PREPRINT</span><span class="venue">bioRxiv</span><span>· 9 citations</span><a href="https://www.biorxiv.org/content/10.1101/2024.06.13.598780v2" target="_blank" rel="noopener">bioRxiv ↗</a></div></div></li>
+          <li class="pub" data-t="benchmark" data-y="2024.4" data-c="53"><span class="y">2024</span><div><p class="ttl">State-of-the-RNArt: benchmarking current methods for RNA 3D structure prediction</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge conf">BENCHMARK</span><span class="venue">NAR Genomics and Bioinformatics 6(2), lqae048</span><span>· 53 citations</span><a href="https://doi.org/10.1093/nargab/lqae048" target="_blank" rel="noopener">DOI ↗</a><a href="#sotr">More ↑</a></div></div></li>
+          <li class="pub" data-t="tool" data-y="2024.2" data-c="17"><span class="y">2024</span><div><p class="ttl">RNAdvisor: a comprehensive benchmarking tool for the measure and prediction of RNA structural model quality</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge preprint">TOOL</span><span class="venue">Briefings in Bioinformatics 25(2), bbae064</span><span>· 17 citations</span><a href="https://doi.org/10.1093/bib/bbae064" target="_blank" rel="noopener">DOI ↗</a></div></div></li>
         </ul>
         <p class="empty" id="pubEmpty" hidden>No publication matches that search.</p>
-        <p style="margin-top:16px"><a class="link" href="https://scholar.google.com/" target="_blank" rel="noopener" style="font-weight:600">Full list on Google Scholar ↗</a></p>
+        <p style="margin-top:16px"><a class="link" href="https://scholar.google.com/citations?user=hvGvUwgAAAAJ&amp;hl=fr" target="_blank" rel="noopener" style="font-weight:600">Google Scholar profile ↗</a></p>
       </div>
       <div class="reveal" style="--d:.1s">
-        <h3 class="sub">Conferences &amp; talks</h3>
+        <h3 class="sub">Open-source code</h3>
         <ul class="talks">
-          <li class="talk"><div class="row"><span class="ev">SynBioBeta</span><span class="d">May 2024</span></div><div class="row"><p>San Francisco, US</p><span class="badge invited">INVITED</span></div></li>
-          <li class="talk"><div class="row"><span class="ev">SEED Conference</span><span class="d">Jun 2019</span></div><div class="row"><p>New York, US</p><span class="badge oral">ORAL</span></div></li>
-          <li class="talk"><div class="row"><span class="ev">EMBO Workshop on DNA Polymerases</span><span class="d">Oct 2018</span></div><div class="row"><p>Heidelberg, DE</p><span class="badge oral">ORAL</span></div></li>
-          <li class="talk"><div class="row"><span class="ev">iGEM Jamboree, judge</span><span class="d">Nov 2018</span></div><div class="row"><p>Boston, US</p><span class="badge invited">INVITED</span></div></li>
-          <li class="talk"><div class="row"><span class="ev">Gordon Research Conference</span><span class="d">Jul 2017</span></div><div class="row"><p>Les Diablerets, CH</p><span class="badge poster">POSTER</span></div></li>
+          <li class="talk"><div class="row"><a class="ev" href="https://github.com/EvryRNA/RNA-TorsionBERT" target="_blank" rel="noopener">RNA-TorsionBERT ↗</a><span class="badge journal">MODEL</span></div><p>Torsion angle prediction and the TB-MCQ scoring function.</p></li>
+          <li class="talk"><div class="row"><a class="ev" href="https://github.com/EvryRNA/rnadvisor" target="_blank" rel="noopener">RNAdvisor ↗</a><span class="badge preprint">TOOL</span></div><p>Quality assessment of RNA 3D models, installable with <code>pip install rnadvisor</code>.</p></li>
+          <li class="talk"><div class="row"><a class="ev" href="https://github.com/EvryRNA/alphafold3_for_rna" target="_blank" rel="noopener">alphafold3_for_rna ↗</a><span class="badge conf">DATA</span></div><p>AlphaFold 3 predictions and scores on five test sets.</p></li>
+          <li class="talk"><div class="row"><a class="ev" href="https://github.com/EvryRNA/state_of_the_rnart_viz" target="_blank" rel="noopener">state_of_the_rnart_viz ↗</a><span class="badge conf">DATA</span></div><p>Benchmark predictions, metrics and figures.</p></li>
+          <li class="talk"><div class="row"><a class="ev" href="https://github.com/clementbernardd/medium_tutorials" target="_blank" rel="noopener">medium_tutorials ↗</a><span class="badge thesis">TUTORIALS</span></div><p>Code for the Medium series on RNA 3D structures.</p></li>
         </ul>
         <div class="phd">
-          <div class="k">PhD thesis · 2019</div>
-          <h4>Deep learning for RNA 3D structure prediction</h4>
-          <p>Includes RNA-TorsionBERT, the AlphaFold 3 benchmark and State-of-the-RNArt. <a href="#torsionbert" style="color:inherit;font-weight:600">See them above ↑</a></p>
+          <div class="k">PhD thesis · Université Paris-Saclay · 2025</div>
+          <h4>Computational methods based on deep learning for the prediction of RNA 3D structures</h4>
+          <p>Prepared at IBISC and LISN. <a href="#thesis" style="color:inherit;font-weight:600">Explore it above ↑</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="tutorials">
+    <div class="sec-head reveal"><span class="tag" style="background:var(--g);color:var(--on-g)" title="Ψ: pseudouridine, the most common modified RNA base">Ψ</span><h2>Tutorials &amp; teaching</h2><p class="sec-sub">I enjoy explaining things. During my PhD I wrote an 11-part Medium series on RNA 3D structures, with all the code on GitHub, and designed projects for master's students.</p></div>
+    <div class="tuto reveal" id="tuto">
+      <div class="series" role="group" aria-label="Tutorial series">
+        <button type="button" class="serie" data-series="basics" aria-pressed="true"><video class="autovid" muted loop playsinline preload="none" poster="assets/media/med_pdb.jpg"><source src="assets/media/med_pdb.mp4" type="video/mp4"></video><span class="sn">01</span><b>RNA 3D basics</b><span class="sc">4 articles</span></button>
+        <button type="button" class="serie" data-series="rnadvisor" aria-pressed="false"><video class="autovid" muted loop playsinline preload="none" poster="assets/media/med_rnadvisor.jpg"><source src="assets/media/med_rnadvisor.mp4" type="video/mp4"></video><span class="sn">02</span><b>RNAdvisor</b><span class="sc">2 articles</span></button>
+        <button type="button" class="serie" data-series="sotr" aria-pressed="false"><video class="autovid" muted loop playsinline preload="none" poster="assets/media/med_sotr.jpg"><source src="assets/media/med_sotr.mp4" type="video/mp4"></video><span class="sn">03</span><b>State-of-the-RNArt</b><span class="sc">3 articles</span></button>
+        <button type="button" class="serie" data-series="af3" aria-pressed="false"><video class="autovid" muted loop playsinline preload="none" poster="assets/media/med_af3.jpg"><source src="assets/media/med_af3.mp4" type="video/mp4"></video><span class="sn">04</span><b>AlphaFold 3 for RNA</b><span class="sc">2 articles</span></button>
+      </div>
+      <div class="posts-wrap">
+        <div class="posts-head"><span class="ctl-k" id="postsLabel">RNA 3D basics</span><button type="button" class="chip-btn" id="postsAll" aria-pressed="false">Show all 11</button></div>
+        <ol class="posts" id="posts">
+          <li data-series="basics"><a href="https://medium.com/@clement.bernard.these/rna-3d-structure-in-depth-tutorials-on-how-to-apprehend-this-research-subject-1d138a112f17" target="_blank" rel="noopener"><span class="pt">RNA 3D structure: in-depth tutorials on how to apprehend this research subject</span><span class="pk">Start here</span></a></li>
+          <li data-series="basics"><a href="https://medium.com/@clement.bernard.these/rna-3d-structure-a-brief-introduction-to-rna-22aa190d838a" target="_blank" rel="noopener"><span class="pt">A brief introduction to RNA</span><span class="pk">Theory</span></a></li>
+          <li data-series="basics"><a href="https://medium.com/@clement.bernard.these/rna-3d-structure-pdb-and-datasets-9274c4296078" target="_blank" rel="noopener"><span class="pt">PDB and datasets</span><span class="pk">Theory</span></a></li>
+          <li data-series="basics"><a href="https://medium.com/@clement.bernard.these/rna-3d-structure-reading-and-writing-pdb-files-with-biopython-and-plotly-c4e9851a74bd" target="_blank" rel="noopener"><span class="pt">Reading and writing PDB files with BioPython and Plotly</span><span class="pk">Hands-on</span></a></li>
+          <li data-series="rnadvisor"><a href="https://medium.com/@clement.bernard.these/rnadvisor-a-comprehensive-tool-for-rna-3d-structure-assessment-theory-464d96f898d8" target="_blank" rel="noopener"><span class="pt">RNAdvisor: a comprehensive tool for RNA 3D structure assessment</span><span class="pk">Theory</span></a></li>
+          <li data-series="rnadvisor"><a href="https://medium.com/@clement.bernard.these/rnadvisor-a-comprehensive-tool-for-rna-3d-structure-assessment-hands-on-tutorial-on-rna-puzzles-bf40c6a0e45c" target="_blank" rel="noopener"><span class="pt">RNAdvisor on RNA-Puzzles using Docker</span><span class="pk">Hands-on</span></a></li>
+          <li data-series="sotr"><a href="https://medium.com/@clement.bernard.these/state-of-the-rnart-current-methods-for-predicting-rna-3d-structures-theory-a6f0bb44e7b2" target="_blank" rel="noopener"><span class="pt">State-of-the-RNArt: current methods for predicting RNA 3D structures</span><span class="pk">Theory</span></a></li>
+          <li data-series="sotr"><a href="https://medium.com/@clement.bernard.these/state-of-the-rnart-benchmarking-current-methods-for-predicting-rna-3d-structures-tutorial-1-2-07f1ed059ecc" target="_blank" rel="noopener"><span class="pt">Benchmarking current methods, part 1 of 2</span><span class="pk">Hands-on</span></a></li>
+          <li data-series="sotr"><a href="https://medium.com/@clement.bernard.these/state-of-the-rnart-benchmarking-current-methods-for-predicting-rna-3d-structures-tutorial-2-2-41a1ab6895c5" target="_blank" rel="noopener"><span class="pt">Benchmarking current methods, part 2 of 2</span><span class="pk">Hands-on</span></a></li>
+          <li data-series="af3"><a href="https://medium.com/@clement.bernard.these/has-alphafold-3-reached-its-success-for-rnas-theoretical-aspects-40302519b2e7" target="_blank" rel="noopener"><span class="pt">Has AlphaFold 3 reached its success for RNA? Theoretical aspects</span><span class="pk">Theory</span></a></li>
+          <li data-series="af3"><a href="https://medium.com/@clement.bernard.these/has-alphafold-3-reached-its-success-for-rnas-benchmark-on-five-datasets-bcc0e11809cb" target="_blank" rel="noopener"><span class="pt">Benchmark on five datasets</span><span class="pk">Hands-on</span></a></li>
+        </ol>
+        <div class="posts-foot">
+          <a class="btn sm solid" href="https://medium.com/@clement.bernard.these" target="_blank" rel="noopener">All articles on Medium ↗</a>
+          <a class="btn sm" href="https://github.com/clementbernardd/medium_tutorials" target="_blank" rel="noopener">Code on GitHub ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="teach reveal">
+      <div class="teach-text">
+        <span class="badge thesis">M2 PROJECT · GENIOMHE</span>
+        <h3>Coarse-grained RMSD vs. common metrics</h3>
+        <p>A project I designed for master's students. Starting from 22 non-redundant RNA-Puzzles structures and predictions from several models, students build a coarse-grained RMSD and compare it with RMSD, MCQ and TM-score. The repository provides the data, precomputed scores and helper code for superimposing point sets.</p>
+        <button class="fig" type="button" aria-label="Enlarge the project overview figure"><img src="assets/media/m2_site.jpg" alt="Native and predicted RNA structures are aligned, then compared with RMSD, TM-score and MCQ" loading="lazy"><span>⤢</span></button>
+        <a class="btn sm" href="https://github.com/clementbernardd/custom_rmsd_m2_geniomhe" target="_blank" rel="noopener" style="margin-top:12px;text-decoration:none">Project on GitHub ↗</a>
+      </div>
+      <div class="sup" id="sup">
+        <h4>Superposition 101</h4>
+        <p>The first step of the project: before computing an RMSD, the prediction must be optimally rotated and translated onto the native structure (the Kabsch algorithm). Drag the blue points, then superimpose.</p>
+        <div class="sup-stage"><canvas id="supCanvas" aria-label="Two point sets: native in orange, prediction in blue. Drag blue points to move them."></canvas></div>
+        <div class="ctl row">
+          <button class="btn solid sm" type="button" id="supGo">Superimpose</button>
+          <button class="chip-btn" type="button" id="supNew">New prediction</button>
+          <span class="sup-rmsd">RMSD <b id="supRmsd">–</b></span>
         </div>
       </div>
     </div>
@@ -529,20 +591,63 @@
   <section class="block" id="skills">
     <div class="sec-head reveal"><span class="tag" style="background:var(--c)">C</span><h2>Skills</h2><p class="sec-sub">Filled pills are the ones I use every week.</p></div>
     <div class="skills" id="skillGrid">
-      <div class="reveal"><h3>Science</h3><div class="pills"><span class="pill lvl">Molecular biology</span><span class="pill lvl">DNA synthesis</span><span class="pill">Assay development</span><span class="pill">Protein engineering</span><span class="pill">NGS QC</span></div></div>
+      <div class="reveal"><h3>Science</h3><div class="pills"><span class="pill lvl">RNA 3D structure</span><span class="pill lvl">Structural bioinformatics</span><span class="pill">Benchmarking &amp; metrics</span><span class="pill">DNA synthesis</span><span class="pill">Molecular biology</span></div></div>
       <div class="reveal" style="--d:.08s"><h3>Product &amp; leadership</h3><div class="pills"><span class="pill lvl">Roadmapping</span><span class="pill lvl">Customer interviews</span><span class="pill">Team leadership</span><span class="pill">Agile</span></div></div>
-      <div class="reveal" style="--d:.16s"><h3>AI &amp; data</h3><div class="pills"><span class="pill lvl">Deep learning</span><span class="pill lvl">NLP / Transformers</span><span class="pill">Reinforcement learning</span><span class="pill lvl">PyTorch</span><span class="pill lvl">Python</span><span class="pill">SQL</span></div></div>
+      <div class="reveal" style="--d:.16s"><h3>AI &amp; data</h3><div class="pills"><span class="pill lvl">Deep learning</span><span class="pill lvl">NLP / Transformers</span><span class="pill">Reinforcement learning</span><span class="pill lvl">PyTorch</span><span class="pill lvl">Python</span><span class="pill">Computer vision</span><span class="pill">Docker</span><span class="pill">SQL</span></div></div>
     </div>
     <button class="skill-toggle" type="button" id="skillToggle" aria-pressed="false">Highlight weekly skills</button>
   </section>
 
   <section class="block" id="projects">
-    <div class="sec-head reveal"><h2>Selected projects</h2><p class="sec-sub" style="margin-left:0">Each project has an animated GIF showing it in action.</p></div>
-    <div class="projects">
-      <a class="proj reveal" data-b="A" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><!-- swap for <img src="assets/img/your.gif" alt="..."> --><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Product · 2024</span><h3>Run-quality dashboard</h3><p>A shared view of synthesis runs across instruments so teams spot drift early.</p><span class="go">Read the case study <span class="arr">→</span></span></a>
-      <a class="proj reveal" style="--d:.08s" data-b="T" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Automation · 2021</span><h3>Hands-free assay workflow</h3><p>Liquid-handling scripts that took a manual protocol to walk-away time.</p><span class="go">Read the case study <span class="arr">→</span></span></a>
-      <a class="proj reveal" data-b="C" href="#torsionbert"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Research · PhD</span><h3>RNA 3D structure prediction</h3><p>Deep learning models and benchmarks for predicting how RNA folds in three dimensions.</p><span class="go">See the thesis work <span class="arr">→</span></span></a>
-      <a class="proj reveal" style="--d:.08s" data-b="G" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Side project</span><h3>Primer calculator</h3><p>A small web tool for Tm and GC content that colleagues still use.</p><span class="go">Try it <span class="arr">→</span></span></a>
+    <div class="sec-head reveal"><h2>Selected projects</h2><p class="sec-sub" style="margin-left:0">Beyond the thesis: reinforcement learning, computer vision, and a hackathon win. Previews play as you hover or scroll.</p></div>
+    <div class="filters proj-filters reveal" role="group" aria-label="Filter projects">
+      <button type="button" data-pf="all" aria-pressed="true">All</button>
+      <button type="button" data-pf="rna" aria-pressed="false">RNA</button>
+      <button type="button" data-pf="rl" aria-pressed="false">Reinforcement learning</button>
+      <button type="button" data-pf="dl" aria-pressed="false">Deep learning</button>
+      <button type="button" data-pf="hack" aria-pressed="false">Hackathon</button>
+    </div>
+    <div class="projects" id="projGrid">
+      <article class="proj pc-a reveal" data-b="A" data-tags="rna dl"><span class="glare" aria-hidden="true"></span>
+        <figure class="media"><video class="autovid" muted loop playsinline preload="none" poster="assets/media/med_sotr.jpg"><source src="assets/media/med_sotr.mp4" type="video/mp4"></video></figure>
+        <span class="k">PhD · 2025</span><h3>RNA 3D structure prediction</h3>
+        <p>Deep learning models and benchmarks for predicting how RNA folds: RNA-TorsionBERT, AlphaFold 3 for RNA, State-of-the-RNArt.</p>
+        <div class="proj-links"><a class="go" href="#thesis">See the thesis work <span class="arr">→</span></a></div>
+      </article>
+      <article class="proj pc-t reveal" style="--d:.08s" data-b="T" data-tags="rna"><span class="glare" aria-hidden="true"></span>
+        <figure class="media"><video class="autovid" muted loop playsinline preload="none" poster="assets/media/rnadvisor_cast.jpg"><source src="assets/media/rnadvisor_cast.mp4" type="video/mp4"></video></figure>
+        <span class="k">Tool · 2024–2025</span><h3>RNAdvisor</h3>
+        <p>One command to score RNA 3D models with a dozen metrics and scoring functions (RMSD, INF, MCQ, lDDT, TM-score…), wrapped in Docker and on PyPI.</p>
+        <div class="proj-links"><a class="go" href="https://github.com/EvryRNA/rnadvisor" target="_blank" rel="noopener">GitHub <span class="arr">→</span></a><a class="go" href="https://doi.org/10.1093/bib/bbae064" target="_blank" rel="noopener">Paper ↗</a></div>
+      </article>
+      <article class="proj pc-c reveal" data-b="C" data-tags="rl dl"><span class="glare" aria-hidden="true"></span>
+        <figure class="media rl-media"><video class="autovid" id="rlVid" muted loop playsinline preload="none" poster="assets/media/rl_acrobot.jpg"><source src="assets/media/rl_acrobot.mp4" type="video/mp4"></video>
+          <div class="envs" role="group" aria-label="Environment"><button type="button" data-env="acrobot" aria-pressed="true">Acrobot</button><button type="button" data-env="cartpole" aria-pressed="false">CartPole</button><button type="button" data-env="mountain" aria-pressed="false">Mountain Car</button></div>
+          <figcaption class="env-cap" id="rlCap">Dueling DQN · count-based exploration</figcaption></figure>
+        <span class="k">Reinforcement learning</span><h3>Count-based exploration</h3>
+        <p>A reimplementation of count-based exploration with static hashing. A bonus reward for rarely visited states, compared with ε-greedy on Q-learning, Sarsa, DQN, DDQN and Dueling DQN.</p>
+        <div class="proj-links"><a class="go" href="https://github.com/clementbernardd/Count-Based-Exploration" target="_blank" rel="noopener">GitHub <span class="arr">→</span></a></div>
+      </article>
+      <article class="proj pc-n reveal" style="--d:.08s" data-b="G" data-tags="rl"><span class="glare" aria-hidden="true"></span>
+        <figure class="media nf-media"><canvas id="nfCanvas" aria-label="Animation: a user moves between content items, cached items are highlighted"></canvas>
+          <div class="envs" role="group" aria-label="Recommendation policy"><button type="button" data-nf="rl" aria-pressed="true">Cache-aware policy</button><button type="button" data-nf="random" aria-pressed="false">Random</button></div>
+          <figcaption class="env-cap">Cache hit rate <b id="nfRate">–</b></figcaption></figure>
+        <span class="k">Reinforcement learning · with Jade Bonnet</span><h3>Network-friendly recommendations</h3>
+        <p>Recommend content the user will enjoy and that is already cached nearby. Solved with Q-learning for a Markovian user, then with Deep Q-learning and Double Q-learning in PyTorch.</p>
+        <div class="proj-links"><a class="go" href="https://github.com/clementbernardd/network_friendly" target="_blank" rel="noopener">GitHub <span class="arr">→</span></a></div>
+      </article>
+      <article class="proj pc-g reveal" data-b="U" data-tags="hack dl"><span class="glare" aria-hidden="true"></span>
+        <figure class="media hack-media"><img src="assets/media/hack_logo.jpg" alt="Energy data hack logo" loading="lazy"><img src="assets/media/hack_conf.jpg" alt="Confusion matrix of the key-press classifier" loading="lazy"><span class="ribbon">🏆 Winner</span></figure>
+        <span class="k">Hackathon · Energy data hack</span><h3>Reading keystrokes from radio waves</h3>
+        <p>Challenge: recover a login and password from intercepted radio frames of an energy sensor. In a team of four, I built the GRU and MLP classifiers (42 classes) and the tool that separates key presses.</p>
+        <div class="proj-links"><a class="go" href="https://github.com/clementbernardd/hackaton_ondes" target="_blank" rel="noopener">GitHub <span class="arr">→</span></a><a class="go" href="https://www.youtube.com/watch?v=0zF37YekAM4" target="_blank" rel="noopener">3-min video ↗</a></div>
+      </article>
+      <article class="proj pc-fg reveal" style="--d:.08s" data-b="N" data-tags="dl"><span class="glare" aria-hidden="true"></span>
+        <figure class="media"><img src="assets/media/rgbd_results.jpg" alt="RGB image, depth and predicted semantic segmentation on NYUv2" loading="lazy"></figure>
+        <span class="k">Computer vision · PyTorch</span><h3>RGB-D semantic segmentation</h3>
+        <p>A PyTorch implementation of two dual-encoder networks, FuseNet and a Global Convolutional Network, that fuse colour and depth to label every pixel of NYUv2 indoor scenes (21 classes).</p>
+        <div class="proj-links"><a class="go" href="https://github.com/clementbernardd/rgbd_semantic" target="_blank" rel="noopener">GitHub <span class="arr">→</span></a></div>
+      </article>
     </div>
   </section>
 
@@ -575,5 +680,6 @@
 <script src="assets/torsion-data.js" defer></script>
 <script src="assets/torsion.js" defer></script>
 <script src="assets/works.js" defer></script>
+<script src="assets/projects.js" defer></script>
 </body>
 </html>
