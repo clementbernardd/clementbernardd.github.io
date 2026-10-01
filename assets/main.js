@@ -91,7 +91,7 @@
 
   // rotating word in the lede
   const rot = $("#rot");
-  const words = ["engineering", "software", "data", "product"];
+  const words = ["engineering", "AI", "machine learning", "data"];
   if (!reduced) {
     let wi = 0;
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

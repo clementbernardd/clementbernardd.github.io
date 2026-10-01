@@ -5,7 +5,10 @@ Static site (HTML + CSS + vanilla JS, no build step), deployed with GitHub Pages
 ```
 index.html          page content
 assets/style.css    styles (light/dark themes)
-assets/main.js      interactions
+assets/main.js      page interactions (theme, nav, reveal, DNA strand…)
+assets/rna3d.js     interactive RNA 3D viewer (thesis section)
+assets/rna-data.js  RNA coordinates extracted from PDB 1EHZ and 1Y26
+assets/ai.js        AI playground: self-attention demo + Q-learning gridworld
 .github/workflows/pages.yml   auto-deploy on push to main
 ```
 

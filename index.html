@@ -33,6 +33,8 @@
         <li><a href="#about">About</a></li>
         <li><a href="#experience">Experience</a></li>
         <li><a href="#education">Education</a></li>
+        <li><a href="#thesis">Thesis</a></li>
+        <li><a href="#ai">AI lab</a></li>
         <li><a href="#research">Research</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#projects">Projects</a></li>
@@ -66,7 +68,7 @@
       <div class="stat reveal"><b data-count="8" data-suffix="+">8+</b><span>years of experience</span></div>
       <div class="stat reveal" style="--d:.08s"><b data-count="3">3</b><span>countries worked in</span></div>
       <div class="stat reveal" style="--d:.16s"><b data-count="14">14</b><span>peer-reviewed publications</span></div>
-      <div class="stat reveal" style="--d:.24s"><b>PhD</b><span>in bioengineering</span></div>
+      <div class="stat reveal" style="--d:.24s"><b>PhD</b><span>in RNA 3D structure prediction</span></div>
     </div>
   </header>
 
@@ -124,11 +126,11 @@
           <h3>PhD Researcher</h3>
           <div class="org">Example University · Laboratory of Synthetic Biology</div>
           <ul>
-            <li>Engineered polymerase variants for template-independent DNA synthesis; first author on 4 papers.</li>
+            <li>Developed deep learning methods to predict and evaluate RNA 3D structures from sequence.</li>
             <li>Presented at 9 international conferences, including 3 oral talks.</li>
             <li>Supervised 5 master's students and taught practical lab classes.</li>
           </ul>
-          <div class="chips"><span class="chip">Protein engineering</span><span class="chip">Directed evolution</span><span class="chip">Teaching</span></div>
+          <div class="chips"><span class="chip">RNA 3D structure</span><span class="chip">Deep learning</span><span class="chip">Teaching</span></div>
         </div>
         <div class="loc">Paris, FR</div>
       </article>
@@ -152,9 +154,9 @@
     <div class="edu-grid">
       <article class="edu feature reveal">
         <div class="yr">2016 – 2019</div>
-        <h3>PhD, Bioengineering</h3>
+        <h3>PhD, Computational biology &amp; AI</h3>
         <div class="school">Example University</div>
-        <p>Thesis: engineering terminal transferases for enzymatic DNA synthesis. Defended with highest honours.</p>
+        <p>Thesis: predicting RNA 3D structures with deep learning. <a href="#thesis" style="color:inherit;font-weight:600">Explore it in 3D ↓</a></p>
       </article>
       <article class="edu reveal" style="--d:.1s">
         <div class="yr">2014 – 2016</div>
@@ -168,6 +170,149 @@
         <div class="school">Example University</div>
         <p>Major in molecular biology, minor in computer science.</p>
       </article>
+    </div>
+  </section>
+
+  <section class="block" id="thesis">
+    <div class="sec-head reveal"><span class="tag" style="background:linear-gradient(135deg,var(--t),var(--c))" title="U: uracil, the RNA base">U</span><h2>My thesis, in 3D</h2><p class="sec-sub">My PhD was about predicting how an RNA molecule folds in 3D from its sequence alone. These are two real, experimentally solved structures from the Protein Data Bank. Drag to rotate them, fold and unfold them, and hover over a nucleotide to see which base it pairs with.</p></div>
+    <div class="rna reveal" id="rna">
+      <div class="rna-stage">
+        <canvas tabindex="0" aria-label="Interactive 3D RNA structure. Drag or use the arrow keys to rotate, plus and minus to zoom, F to fold or unfold, space to pause the spin."></canvas>
+        <div class="rna-tip" hidden></div>
+        <div class="rna-legend" aria-hidden="true"><span class="lg A">A</span><span class="lg U">U</span><span class="lg G">G</span><span class="lg C">C</span></div>
+        <div class="rna-zoom">
+          <button class="icon-btn" type="button" id="rnaZoomIn" aria-label="Zoom in">+</button>
+          <button class="icon-btn" type="button" id="rnaZoomOut" aria-label="Zoom out">−</button>
+        </div>
+        <div class="rna-hint" aria-hidden="true">drag to rotate · click, then scroll to zoom</div>
+      </div>
+      <div class="rna-panel">
+        <div class="ctl">
+          <span class="ctl-k">Structure</span>
+          <div class="seg">
+            <button type="button" data-rna="0" aria-pressed="true">tRNA</button>
+            <button type="button" data-rna="1" aria-pressed="false">Riboswitch</button>
+          </div>
+          <p class="rna-name"><span id="rnaName"></span> <a class="link" id="rnaLink" href="https://www.rcsb.org/" target="_blank" rel="noopener">RCSB ↗</a></p>
+        </div>
+        <div class="ctl">
+          <span class="ctl-k">Colour by</span>
+          <div class="seg">
+            <button type="button" data-color="nuc" aria-pressed="true">Nucleotide</button>
+            <button type="button" data-color="rainbow" aria-pressed="false">5′ → 3′</button>
+            <button type="button" data-color="pair" aria-pressed="false">Paired</button>
+          </div>
+        </div>
+        <div class="ctl">
+          <span class="ctl-k">Folding</span>
+          <div class="fold-row">
+            <button class="btn solid sm" type="button" id="rnaFoldBtn">Unfold</button>
+            <input type="range" id="rnaFold" min="0" max="100" value="100" aria-label="Folding progress, from unfolded to native structure">
+          </div>
+          <div class="readouts">
+            <div><b id="rnaRmsd">0.0 Å</b><span>RMSD to native</span></div>
+            <div><b id="rnaPairs">0 / 0</b><span>base pairs formed</span></div>
+          </div>
+        </div>
+        <div class="ctl row">
+          <button class="chip-btn" type="button" id="rnaSpin" aria-pressed="true">Pause spin</button>
+          <button class="chip-btn" type="button" id="rnaReset">Reset view</button>
+        </div>
+        <p class="fine">The folding path here is a simple interpolation to illustrate the idea, not a physics simulation. Each nucleotide is drawn as its C4′ atom plus its base.</p>
+      </div>
+      <div class="rna-seq-wrap">
+        <span class="ctl-k">Sequence &amp; secondary structure (dot-bracket). Hover to find a base in 3D</span>
+        <div class="rna-seq" id="rnaSeq"></div>
+      </div>
+    </div>
+    <div class="pipeline">
+      <div class="reveal"><span class="step">1D</span><h3>Sequence</h3><p>A string of A, U, G and C. Cheap to read, but it says nothing directly about shape.</p></div>
+      <div class="reveal" style="--d:.08s"><span class="step">2D</span><h3>Base pairing</h3><p>Bases pair up into helices and loops: the brackets in the strip above.</p></div>
+      <div class="reveal" style="--d:.16s"><span class="step">3D</span><h3>Fold</h3><p>Helices pack into a precise 3D shape that drives function. Predicting that shape was the goal of my thesis.</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="ai">
+    <div class="sec-head reveal"><span class="tag" style="background:var(--fg);color:var(--bg);font-size:.75rem">AI</span><h2>AI playground</h2><p class="sec-sub">Much of my work has been in AI, especially natural language processing and reinforcement learning. Here are two small demos of the core ideas, both running live in your browser.</p></div>
+    <div class="ai-lab reveal" id="aiLab">
+      <div class="tabs" role="tablist" aria-label="AI demos">
+        <button type="button" role="tab" id="tabNlp" data-tab="nlp" aria-controls="panelNlp" aria-selected="true"><span>NLP</span> Self-attention</button>
+        <button type="button" role="tab" id="tabRl" data-tab="rl" aria-controls="panelRl" aria-selected="false" tabindex="-1"><span>RL</span> Q-learning agent</button>
+      </div>
+
+      <div class="panel" role="tabpanel" id="panelNlp" aria-labelledby="tabNlp">
+        <p class="panel-lede">Transformers read text by letting every token <em>attend</em> to every other token. Type a sentence, then hover over a token on the left to see where it looks.</p>
+        <input class="search" id="attnInput" type="text" value="RNA folds into complex three-dimensional shapes." aria-label="Sentence to analyse" maxlength="120" spellcheck="false">
+        <div class="examples">
+          <span class="ctl-k">Try</span>
+          <button type="button" class="chip-btn" data-example="The agent learns which action leads to the goal.">RL sentence</button>
+          <button type="button" class="chip-btn" data-example="Attention is all you need, they said.">Famous paper</button>
+          <button type="button" class="chip-btn" data-example="Le modèle lit la séquence, puis prédit la structure.">En français</button>
+        </div>
+        <div class="seg heads" role="group" aria-label="Attention head">
+          <button type="button" data-head="0" aria-pressed="true">Head 1 · local</button>
+          <button type="button" data-head="1" aria-pressed="false">Head 2 · similar</button>
+          <button type="button" data-head="2" aria-pressed="false">Head 3 · previous</button>
+          <button type="button" data-head="3" aria-pressed="false">Head 4 · summary</button>
+          <button type="button" data-head="4" aria-pressed="false">Mean</button>
+        </div>
+        <div class="attn-grid">
+          <div class="attn">
+            <div class="attn-col" id="attnQ" aria-label="Query tokens"></div>
+            <svg id="attnSvg" aria-hidden="true"></svg>
+            <div class="attn-col k" id="attnK" aria-hidden="true"></div>
+          </div>
+          <div class="attn-side">
+            <span class="ctl-k">Attention matrix (rows: queries)</span>
+            <div class="attn-matrix" id="attnMatrix" aria-hidden="true"></div>
+          </div>
+        </div>
+        <p class="attn-info" id="attnHeadInfo" aria-live="polite"></p>
+        <p class="fine">Toy model: each head uses a hand-written scoring rule over hashed character trigrams and positions, followed by a real softmax. No trained weights involved.</p>
+      </div>
+
+      <div class="panel" role="tabpanel" id="panelRl" aria-labelledby="tabRl" hidden>
+        <p class="panel-lede">An agent starts out knowing nothing. It explores, gets rewarded at the <b>goal</b>, punished in the <b class="lava-t">lava</b>, and updates a Q-table after every step. Press <b>Train</b> and watch the arrows (its policy) appear. Then draw new walls and see it adapt.</p>
+        <div class="rl-grid">
+          <div class="rl-board"><canvas id="rlCanvas" aria-label="Gridworld. Click or drag to draw with the selected tool."></canvas></div>
+          <div class="rl-side">
+            <div class="ctl row">
+              <button class="btn solid sm" type="button" id="rlRun" aria-pressed="false">Train</button>
+              <button class="btn sm" type="button" id="rlGreedy">Run best policy</button>
+            </div>
+            <div class="ctl">
+              <span class="ctl-k">Speed</span>
+              <div class="seg">
+                <button type="button" data-speed="1" aria-pressed="true">Watch</button>
+                <button type="button" data-speed="2" aria-pressed="false">Fast</button>
+                <button type="button" data-speed="3" aria-pressed="false">Turbo</button>
+              </div>
+            </div>
+            <div class="ctl">
+              <span class="ctl-k">Draw</span>
+              <div class="seg">
+                <button type="button" data-tool="wall" aria-pressed="true">Wall</button>
+                <button type="button" data-tool="lava" aria-pressed="false">Lava</button>
+                <button type="button" data-tool="goal" aria-pressed="false">Goal</button>
+                <button type="button" data-tool="start" aria-pressed="false">Start</button>
+              </div>
+            </div>
+            <div class="readouts four">
+              <div><b id="rlEp">0</b><span>episodes</span></div>
+              <div><b id="rlEps">1.00</b><span>ε (exploration)</span></div>
+              <div><b id="rlLast">–</b><span>steps, last episode</span></div>
+              <div><b id="rlRate">–</b><span>success, last 20</span></div>
+            </div>
+            <div class="ctl"><span class="ctl-k">Steps per episode</span><canvas id="rlSpark" class="spark" aria-hidden="true"></canvas></div>
+            <p class="rl-msg" id="rlMsg" aria-live="polite"></p>
+            <div class="ctl row">
+              <button class="chip-btn" type="button" id="rlReset">Wipe memory</button>
+              <button class="chip-btn" type="button" id="rlMap">Reset map</button>
+            </div>
+            <p class="fine">Tabular Q-learning: α = 0.5, γ = 0.95, ε-greedy exploration decaying from 1 to 0.05. Green cells mean the agent expects reward there.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -191,11 +336,11 @@
           <span class="count" id="pubCount" aria-live="polite"></span>
         </div>
         <ul class="pubs" id="pubs">
-          <li class="pub" data-t="preprint"><span class="y">2025</span><div><p class="ttl">Scaling enzymatic synthesis to long oligonucleotides with engineered TdT variants</p><div class="au"><strong>Bernard C.</strong>, Martin L., Dubois A., et al.</div><div class="meta"><span class="badge preprint">PREPRINT</span><span class="venue">bioRxiv</span><a href="#research">DOI ↗</a></div></div></li>
-          <li class="pub" data-t="journal"><span class="y">2023</span><div><p class="ttl">Kinetic profiling of terminal transferase variants for template-independent synthesis</p><div class="au">Martin L., <strong>Bernard C.</strong>, Rossi G.</div><div class="meta"><span class="badge journal">JOURNAL</span><span class="venue">Nucleic Acids Research</span><span>· 58 citations</span><a href="#research">DOI ↗</a></div></div></li>
-          <li class="pub" data-t="journal"><span class="y">2019</span><div><p class="ttl">Directed evolution of a polymerase for 3′-blocked nucleotide incorporation</p><div class="au"><strong>Bernard C.</strong>, Lefèvre P., Nguyen T., Garnier S.</div><div class="meta"><span class="badge journal">JOURNAL</span><span class="venue">ACS Synthetic Biology</span><span>· 112 citations</span><a href="#research">DOI ↗</a></div></div></li>
-          <li class="pub" data-t="conf"><span class="y">2018</span><div><p class="ttl">A microfluidic screen for high-throughput enzyme variant selection</p><div class="au"><strong>Bernard C.</strong>, Garnier S.</div><div class="meta"><span class="badge conf">PROCEEDINGS</span><span class="venue">Proc. SynBio Europe</span><a href="#research">DOI ↗</a></div></div></li>
-          <li class="pub" data-t="journal"><span class="y">2018</span><div><p class="ttl">Structural basis of nucleotide selectivity in engineered transferases</p><div class="au">Nguyen T., <strong>Bernard C.</strong>, Lefèvre P., et al.</div><div class="meta"><span class="badge journal">JOURNAL</span><span class="venue">Nature Communications</span><span>· 96 citations</span><a href="#research">DOI ↗</a></div></div></li>
+          <li class="pub" data-t="preprint"><span class="y">2025</span><div><p class="ttl">[Placeholder] A language-model approach to RNA 3D structure prediction</p><div class="au"><strong>Bernard C.</strong>, Martin L., Dubois A., et al.</div><div class="meta"><span class="badge preprint">PREPRINT</span><span class="venue">bioRxiv</span><a href="#research">DOI ↗</a></div></div></li>
+          <li class="pub" data-t="journal"><span class="y">2023</span><div><p class="ttl">[Placeholder] Benchmarking scoring functions for RNA 3D models</p><div class="au">Martin L., <strong>Bernard C.</strong>, Rossi G.</div><div class="meta"><span class="badge journal">JOURNAL</span><span class="venue">Nucleic Acids Research</span><span>· 58 citations</span><a href="#research">DOI ↗</a></div></div></li>
+          <li class="pub" data-t="journal"><span class="y">2019</span><div><p class="ttl">[Placeholder] Reinforcement learning for RNA structure refinement</p><div class="au"><strong>Bernard C.</strong>, Lefèvre P., Nguyen T., Garnier S.</div><div class="meta"><span class="badge journal">JOURNAL</span><span class="venue">ACS Synthetic Biology</span><span>· 112 citations</span><a href="#research">DOI ↗</a></div></div></li>
+          <li class="pub" data-t="conf"><span class="y">2018</span><div><p class="ttl">[Placeholder] Attention-based models for RNA secondary structure</p><div class="au"><strong>Bernard C.</strong>, Garnier S.</div><div class="meta"><span class="badge conf">PROCEEDINGS</span><span class="venue">Proc. SynBio Europe</span><a href="#research">DOI ↗</a></div></div></li>
+          <li class="pub" data-t="journal"><span class="y">2018</span><div><p class="ttl">[Placeholder] Evaluating deep learning predictions of RNA tertiary structure</p><div class="au">Nguyen T., <strong>Bernard C.</strong>, Lefèvre P., et al.</div><div class="meta"><span class="badge journal">JOURNAL</span><span class="venue">Nature Communications</span><span>· 96 citations</span><a href="#research">DOI ↗</a></div></div></li>
         </ul>
         <p class="empty" id="pubEmpty" hidden>No publication matches that search.</p>
         <p style="margin-top:16px"><a class="link" href="https://scholar.google.com/" target="_blank" rel="noopener" style="font-weight:600">Full list on Google Scholar ↗</a></p>
@@ -211,7 +356,7 @@
         </ul>
         <div class="phd">
           <div class="k">PhD thesis · 2019</div>
-          <h4>Engineering terminal transferases for enzymatic DNA synthesis</h4>
+          <h4>Deep learning for RNA 3D structure prediction</h4>
           <p>Example University. Supervised by Prof. S. Garnier.</p>
         </div>
       </div>
@@ -223,7 +368,7 @@
     <div class="skills" id="skillGrid">
       <div class="reveal"><h3>Science</h3><div class="pills"><span class="pill lvl">Molecular biology</span><span class="pill lvl">DNA synthesis</span><span class="pill">Assay development</span><span class="pill">Protein engineering</span><span class="pill">NGS QC</span></div></div>
       <div class="reveal" style="--d:.08s"><h3>Product &amp; leadership</h3><div class="pills"><span class="pill lvl">Roadmapping</span><span class="pill lvl">Customer interviews</span><span class="pill">Team leadership</span><span class="pill">Agile</span></div></div>
-      <div class="reveal" style="--d:.16s"><h3>Data &amp; tools</h3><div class="pills"><span class="pill lvl">Python</span><span class="pill">R</span><span class="pill lvl">SQL</span><span class="pill">Power BI</span><span class="pill">Benchling</span></div></div>
+      <div class="reveal" style="--d:.16s"><h3>AI &amp; data</h3><div class="pills"><span class="pill lvl">Deep learning</span><span class="pill lvl">NLP / Transformers</span><span class="pill">Reinforcement learning</span><span class="pill lvl">PyTorch</span><span class="pill lvl">Python</span><span class="pill">SQL</span></div></div>
     </div>
     <button class="skill-toggle" type="button" id="skillToggle" aria-pressed="false">Highlight weekly skills</button>
   </section>
@@ -233,7 +378,7 @@
     <div class="projects">
       <a class="proj reveal" data-b="A" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><!-- swap for <img src="assets/img/your.gif" alt="..."> --><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Product · 2024</span><h3>Run-quality dashboard</h3><p>A shared view of synthesis runs across instruments so teams spot drift early.</p><span class="go">Read the case study <span class="arr">→</span></span></a>
       <a class="proj reveal" style="--d:.08s" data-b="T" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Automation · 2021</span><h3>Hands-free assay workflow</h3><p>Liquid-handling scripts that took a manual protocol to walk-away time.</p><span class="go">Read the case study <span class="arr">→</span></span></a>
-      <a class="proj reveal" data-b="C" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Research · 2018</span><h3>Enzyme variant screen</h3><p>The microfluidic screen at the heart of my PhD, behind four first-author papers.</p><span class="go">Read the paper <span class="arr">→</span></span></a>
+      <a class="proj reveal" data-b="C" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Research · PhD</span><h3>RNA 3D structure prediction</h3><p>Deep learning models and benchmarks for predicting how RNA folds in three dimensions.</p><span class="go">Read the paper <span class="arr">→</span></span></a>
       <a class="proj reveal" style="--d:.08s" data-b="G" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Side project</span><h3>Primer calculator</h3><p>A small web tool for Tm and GC content that colleagues still use.</p><span class="go">Try it <span class="arr">→</span></span></a>
     </div>
   </section>
@@ -260,5 +405,8 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/main.js" defer></script>
+<script src="assets/rna-data.js" defer></script>
+<script src="assets/rna3d.js" defer></script>
+<script src="assets/ai.js" defer></script>
 </body>
 </html>
