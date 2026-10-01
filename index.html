@@ -238,6 +238,7 @@
           <a href="#torsionbert"><span>01</span> RNA-TorsionBERT</a>
           <a href="#af3"><span>02</span> AlphaFold 3 for RNA</a>
           <a href="#sotr"><span>03</span> State-of-the-RNArt</a>
+          <a href="#frames"><span>04</span> Frame prediction</a>
         </nav>
       </div>
 
@@ -395,8 +396,82 @@
           </div>
         </div>
       </article>
-    </div>
 
+      <!-- 04 Frame-based reconstruction -->
+      <article class="work" id="frames">
+        <header class="work-top reveal">
+          <span class="work-n">04</span>
+          <div class="work-title">
+            <span class="badge thesis">PHD THESIS</span>
+            <h3>Predicting nucleotide frames with language models</h3>
+            <p>Each nucleotide as a rigid body: predict its rotation and translation, then rebuild every atom.</p>
+          </div>
+        </header>
+        <div class="work-cols reveal">
+          <div class="work-text">
+            <p>Instead of predicting thousands of atom coordinates, the structure is described by <b>one frame per nucleotide</b>: a rotation matrix R<sub>i</sub> and a translation t<sub>i</sub>. A frame is defined from 3 or 4 atoms of the nucleotide. Placing an ideal, rigid nucleotide on each frame rebuilds the full-atom structure.</p>
+            <p>A <b>language model</b> reads the RNA sequence and predicts these rotations and translations. Extra heads also predict the quality of the resulting structure: <b>RMSD</b>, <b>INF</b> and <b>TM-score</b>, without needing the true structure.</p>
+          </div>
+          <div class="angles">
+            <span class="ctl-k">Reconstruction</span>
+            <p class="frame-eq">x<sub>atom</sub> = R<sub>i</sub> · x<sub>atom</sub><sup>local</sup> + t<sub>i</sub></p>
+            <dl>
+              <div><dt>R<sub>i</sub></dt><dd>3 × 3 rotation: how nucleotide <i>i</i> is oriented.</dd></div>
+              <div><dt>t<sub>i</sub></dt><dd>Translation: where nucleotide <i>i</i> sits.</dd></div>
+              <div><dt>x<sup>local</sup></dt><dd>Atom coordinates of an ideal A, U, G or C, expressed in its own frame.</dd></div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="tlab flab reveal" id="flab">
+          <div class="tlab-head">
+            <h4>From sequence to frames to atoms</h4>
+            <p>Watch the pipeline on the tRNA: the model reads the sequence, frames fly from an identity pose to their predicted rotation and translation, then rigid nucleotides snap onto them. Add rotation or translation error to see how the RMSD, INF and TM-score respond.</p>
+          </div>
+          <ol class="fpipe" aria-label="Pipeline steps">
+            <li data-step="1"><span>1</span>Sequence</li>
+            <li data-step="2"><span>2</span>Language model</li>
+            <li data-step="3"><span>3</span>Frame head · R<sub>i</sub>, t<sub>i</sub></li>
+            <li data-step="4"><span>4</span>Rigid nucleotides → atoms</li>
+            <li data-step="5"><span>5</span>Quality head · RMSD, INF, TM</li>
+          </ol>
+          <div class="ftokens" id="flTokens" aria-hidden="true"></div>
+          <div class="tlab-grid">
+            <div class="tlab-stage">
+              <canvas id="flCanvas" tabindex="0" aria-label="Frame-based reconstruction of a tRNA. Drag or use the arrow keys to rotate."></canvas>
+              <div class="tlab-legend" aria-hidden="true"><span><i class="ln" style="background:var(--a)"></i>x</span><span><i class="ln" style="background:var(--c)"></i>y</span><span><i class="ln" style="background:var(--t)"></i>z frame axes</span></div>
+            </div>
+            <div class="tlab-panel">
+              <div class="ctl row"><button class="btn solid sm" type="button" id="flPlay">▶ Play the pipeline</button><button class="chip-btn" type="button" id="flSpin" aria-pressed="true">Pause spin</button></div>
+              <div class="ctl">
+                <span class="ctl-k">Frame built from</span>
+                <div class="seg"><button type="button" data-fmode="3" aria-pressed="true">3 atoms</button><button type="button" data-fmode="4" aria-pressed="false">4 atoms</button></div>
+                <p class="tl-def" id="flAtoms">P · C4′ · N1/N9  (Gram-Schmidt)</p>
+              </div>
+              <div class="ctl">
+                <span class="ctl-k">Show</span>
+                <div class="ctl row"><button class="chip-btn" type="button" data-fview="frames" aria-pressed="true">Frames</button><button class="chip-btn" type="button" data-fview="atoms" aria-pressed="true">Atoms</button></div>
+              </div>
+              <div class="ctl">
+                <label class="ctl-k" for="flRot">Rotation error <b id="flRotV">0°</b></label>
+                <input type="range" id="flRot" min="0" max="45" value="0">
+                <label class="ctl-k" for="flTr">Translation error <b id="flTrV">0.0 Å</b></label>
+                <div class="fold-row"><input type="range" id="flTr" min="0" max="40" value="0"><button class="chip-btn" type="button" id="flReseed">New noise</button></div>
+              </div>
+              <div class="quality">
+                <span class="ctl-k">Quality (vs. the crystal structure)</span>
+                <div class="readouts three">
+                  <div><b id="flRmsd">0 Å</b><span>RMSD ↓</span></div>
+                  <div><b id="flInf">0</b><span>INF ↑</span></div>
+                  <div><b id="flTm">0</b><span>TM-score ↑</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="fine">Illustration on the tRNA (PDB 1EHZ): frames are taken from the crystal structure rather than predicted, and each nucleotide uses a template averaged over the tRNA's own A, U, G and C. Even with perfect frames, rigid templates leave about 0.8 Å RMSD. In the real model the quality head estimates these scores from the sequence alone; here they are computed against the crystal structure. INF compares base pairs (Watson-Crick and G·U), and TM-score uses C4′ atoms with the RNA-align d₀ after superposition. Try it: rotation errors barely move the C4′ trace (the frame origin), so TM-score stays high while base pairs break and INF collapses. Translation errors hurt all three.</p>
+        </div>
+      </article>
+    </div>
   </section>
 
   <section class="block" id="ai">
@@ -679,6 +754,8 @@
 <script src="assets/ai.js" defer></script>
 <script src="assets/torsion-data.js" defer></script>
 <script src="assets/torsion.js" defer></script>
+<script src="assets/frames-data.js" defer></script>
+<script src="assets/frames.js" defer></script>
 <script src="assets/works.js" defer></script>
 <script src="assets/projects.js" defer></script>
 </body>

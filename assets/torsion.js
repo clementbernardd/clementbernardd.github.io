@@ -315,4 +315,5 @@
   new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColors);
   reseed(); readColors(); setSource("trna");
+  window.RNAGeom = { superpose }; // shared with the frame reconstruction demo
 })();

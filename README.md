@@ -11,6 +11,8 @@ assets/rna-data.js  RNA coordinates extracted from PDB 1EHZ and 1Y26
 assets/ai.js        AI playground: self-attention demo + Q-learning gridworld
 assets/torsion.js   RNA-TorsionBERT lab: rebuild a backbone from torsion angles (NeRF)
 assets/torsion-data.js  tRNA 1EHZ backbone atoms, torsions, mean bond lengths/angles
+assets/frames.js    frame-based reconstruction demo (rigid nucleotides on R, t frames + RMSD/INF/TM)
+assets/frames-data.js  tRNA 1EHZ heavy atoms, frames and averaged nucleotide templates
 assets/works.js     figure switchers + lightbox for the thesis works
 assets/img/         figures from the EvryRNA repos (resized for the web)
 assets/projects.js  tutorials, projects, teaching demo (2D superposition), publication sorting
