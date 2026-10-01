@@ -9,6 +9,10 @@ assets/main.js      page interactions (theme, nav, reveal, DNA strand…)
 assets/rna3d.js     interactive RNA 3D viewer (thesis section)
 assets/rna-data.js  RNA coordinates extracted from PDB 1EHZ and 1Y26
 assets/ai.js        AI playground: self-attention demo + Q-learning gridworld
+assets/torsion.js   RNA-TorsionBERT lab: rebuild a backbone from torsion angles (NeRF)
+assets/torsion-data.js  tRNA 1EHZ backbone atoms, torsions, mean bond lengths/angles
+assets/works.js     figure switchers + lightbox for the thesis works
+assets/img/         figures from the EvryRNA repos (resized for the web)
 .github/workflows/pages.yml   auto-deploy on push to main
 ```
 

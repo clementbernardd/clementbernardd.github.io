@@ -230,6 +230,172 @@
       <div class="reveal" style="--d:.08s"><span class="step">2D</span><h3>Base pairing</h3><p>Bases pair up into helices and loops: the brackets in the strip above.</p></div>
       <div class="reveal" style="--d:.16s"><span class="step">3D</span><h3>Fold</h3><p>Helices pack into a precise 3D shape that drives function. Predicting that shape was the goal of my thesis.</p></div>
     </div>
+    <div class="works">
+      <div class="works-head reveal">
+        <h3>Thesis work</h3>
+        <nav class="works-nav" aria-label="Thesis projects">
+          <a href="#torsionbert"><span>01</span> RNA-TorsionBERT</a>
+          <a href="#af3"><span>02</span> AlphaFold 3 for RNA</a>
+          <a href="#sotr"><span>03</span> State-of-the-RNArt</a>
+        </nav>
+      </div>
+
+      <!-- 01 RNA-TorsionBERT -->
+      <article class="work" id="torsionbert">
+        <header class="work-top reveal">
+          <span class="work-n">01</span>
+          <div class="work-title">
+            <span class="badge journal">BIOINFORMATICS · 2025</span>
+            <h3>RNA-TorsionBERT</h3>
+            <p>A language model that predicts RNA torsion angles from the sequence alone.</p>
+          </div>
+          <div class="work-links">
+            <a class="btn sm" href="https://github.com/EvryRNA/RNA-TorsionBERT" target="_blank" rel="noopener">GitHub ↗</a>
+            <a class="btn sm solid" href="https://doi.org/10.1093/bioinformatics/btaf004" target="_blank" rel="noopener">Paper ↗</a>
+          </div>
+        </header>
+        <div class="work-cols reveal">
+          <div class="work-text">
+            <p>Predicting 3D coordinates directly is hard. Instead, RNA-TorsionBERT predicts the <b>angles</b> that describe how each nucleotide's backbone twists. It's a BERT-based language model (DNABERT, ~87M parameters) trained on about 4,200 RNA structures. On RNA-Puzzles and CASP-RNA, it improves the MCQ (mean of circular quantities) over SPOT-RNA-1D and over angles inferred from existing methods.</p>
+            <p>It also comes with <b>TB-MCQ</b>, a scoring function that judges a predicted 3D structure by comparing its angles with the ones RNA-TorsionBERT predicts.</p>
+            <button class="fig thumb" type="button" aria-label="Enlarge the RNA-TorsionBERT architecture figure"><img src="assets/img/tb_arch.jpg" alt="RNA-TorsionBERT architecture: k-mer tokenisation, DNABERT-3, and a regression head predicting sine and cosine of each angle" loading="lazy"><span>Architecture ⤢</span></button>
+          </div>
+          <div class="angles">
+            <span class="ctl-k">The angles it predicts</span>
+            <dl>
+              <div><dt>α β γ δ ε ζ</dt><dd>Six backbone torsions, each defined by four consecutive atoms along P – O5′ – C5′ – C4′ – C3′ – O3′ – P.</dd></div>
+              <div><dt>χ</dt><dd>The glycosidic torsion: how the base is oriented relative to the sugar.</dd></div>
+              <div><dt>ν₀ – ν₄</dt><dd>Five sugar-ring torsions that describe the ribose pucker.</dd></div>
+              <div><dt>η θ</dt><dd>Pseudo-torsions on a coarse-grained P and C4′ trace, a compact summary of the backbone.</dd></div>
+            </dl>
+            <p class="fine">Angles are periodic, so the model predicts the sine and cosine of each one and converts them back to degrees.</p>
+          </div>
+        </div>
+
+        <div class="tlab reveal" id="tlab">
+          <div class="tlab-head">
+            <h4>Rebuild an RNA from its angles</h4>
+            <p>If you keep every bond length and bond angle constant, the torsion angles alone determine the 3D shape. Below, the backbone is rebuilt atom by atom from its torsions (the NeRF algorithm), using average bond lengths and angles. The grey trace is the reference structure. Add noise to see how small angle errors grow along the chain.</p>
+          </div>
+          <div class="tlab-grid">
+            <div class="tlab-stage">
+              <canvas id="tlCanvas" tabindex="0" aria-label="Rebuilt RNA backbone. Drag or use the arrow keys to rotate."></canvas>
+              <div class="tlab-legend" aria-hidden="true"><span><i class="ln ref"></i>reference</span><span><i class="ln reb"></i>rebuilt from angles</span><span><i class="ln sel"></i>selected angle</span></div>
+            </div>
+            <div class="tlab-panel">
+              <div class="ctl">
+                <span class="ctl-k">Start from</span>
+                <div class="seg">
+                  <button type="button" data-src="trna" aria-pressed="true">tRNA angles (PDB 1EHZ)</button>
+                  <button type="button" data-src="aform" aria-pressed="false">Ideal A-form helix</button>
+                </div>
+              </div>
+              <div class="ctl">
+                <span class="ctl-k">Angle</span>
+                <div class="seg ang">
+                  <button type="button" data-ang="α" aria-pressed="true">α</button><button type="button" data-ang="β" aria-pressed="false">β</button><button type="button" data-ang="γ" aria-pressed="false">γ</button><button type="button" data-ang="δ" aria-pressed="false">δ</button><button type="button" data-ang="ε" aria-pressed="false">ε</button><button type="button" data-ang="ζ" aria-pressed="false">ζ</button><button type="button" data-ang="η" aria-pressed="false" class="ps">η</button><button type="button" data-ang="θ" aria-pressed="false" class="ps">θ</button>
+                </div>
+                <p class="tl-def" id="tlDef"></p>
+                <p class="tl-def" id="tlValue"></p>
+              </div>
+              <div class="ctl">
+                <label class="ctl-k" for="tlOffset">Shift this angle in every nucleotide <b id="tlOffsetVal">0°</b></label>
+                <input type="range" id="tlOffset" min="-90" max="90" value="0">
+              </div>
+              <div class="ctl">
+                <label class="ctl-k" for="tlNoise">Simulated prediction error <b id="tlNoiseVal">σ = 0°</b></label>
+                <div class="fold-row"><input type="range" id="tlNoise" min="0" max="40" value="0"><button class="chip-btn" type="button" id="tlReseed">New noise</button></div>
+              </div>
+              <div class="readouts three">
+                <div><b id="tlMae">0°</b><span>angle error (MAE)</span></div>
+                <div><b id="tlRmsd">0 Å</b><span>RMSD, superposed</span></div>
+                <div><b id="tlAtoms">0</b><span>atoms placed</span></div>
+              </div>
+              <div class="ctl row">
+                <button class="btn solid sm" type="button" id="tlBuild">Watch it rebuild</button>
+                <button class="chip-btn" type="button" id="tlSpin" aria-pressed="true">Pause spin</button>
+                <button class="chip-btn" type="button" id="tlResetAngles">Reset angles</button>
+              </div>
+            </div>
+            <div class="tlab-profile">
+              <span class="ctl-k">Selected angle along the chain: <i class="dot-ref"></i> reference <i class="dot-reb"></i> rebuilt. Hover to pick a nucleotide</span>
+              <canvas id="tlProfile" aria-hidden="true"></canvas>
+            </div>
+          </div>
+          <p class="fine">Even with the exact angles from the crystal structure, using average bond lengths and angles leaves about 3 Å of RMSD on this 76-nucleotide tRNA: tiny geometric deviations add up over 456 backbone atoms. That's one reason angle errors are measured with MCQ rather than read straight off the coordinates.</p>
+        </div>
+
+        <button class="fig wide reveal" type="button" aria-label="Enlarge the TB-MCQ figure"><img src="assets/img/tb_mcq.jpg" alt="TB-MCQ: angles extracted from a predicted structure are compared with RNA-TorsionBERT predictions using MCQ" loading="lazy"><span>TB-MCQ scoring ⤢</span></button>
+      </article>
+
+      <!-- 02 AlphaFold 3 benchmark -->
+      <article class="work" id="af3">
+        <header class="work-top reveal">
+          <span class="work-n">02</span>
+          <div class="work-title">
+            <span class="badge conf">ACTA CRYST. D · 2025</span>
+            <h3>Has AlphaFold 3 achieved success for RNA?</h3>
+            <p>A benchmark of AlphaFold 3 on RNA 3D structure prediction.</p>
+          </div>
+          <div class="work-links">
+            <a class="btn sm" href="https://github.com/EvryRNA/alphafold3_for_rna" target="_blank" rel="noopener">GitHub ↗</a>
+            <a class="btn sm solid" href="https://doi.org/10.1107/S2059798325000592" target="_blank" rel="noopener">Paper ↗</a>
+          </div>
+        </header>
+        <div class="work-cols reveal">
+          <div class="work-text">
+            <p>AlphaFold 2 transformed protein structure prediction. AlphaFold 3 extends it to RNA, DNA, ligands and ions. We compared it with ab initio, template-based and deep learning methods on <b>five test sets</b>, including orphan RNAs and long RNAs.</p>
+            <p>Predictions were scored with a wide panel of metrics computed with <a class="link" href="https://github.com/EvryRNA/rnadvisor" target="_blank" rel="noopener">RNAdvisor</a>. We also looked at key RNA interactions: Watson-Crick and non-Watson-Crick base pairs, and stacking.</p>
+            <div class="tagrow"><span class="ctl-k">Test sets</span><span class="chip">RNA-Puzzles</span><span class="chip">CASP-RNA</span><span class="chip">RNASolo</span><span class="chip">RNA3DB_0 (orphans)</span><span class="chip">RNA3DB_Long</span></div>
+            <div class="tagrow"><span class="ctl-k">Metrics</span><span class="chip">RMSD</span><span class="chip">εRMSD</span><span class="chip">TM-score</span><span class="chip">GDT-TS</span><span class="chip">lDDT</span><span class="chip">MCQ</span><span class="chip">INF</span><span class="chip">CAD</span><span class="chip">P-value</span></div>
+          </div>
+          <div class="figbox" data-figs="assets/img/{v}.jpg" data-caps='{"af3_abstract":"Graphical abstract","af3_len":"Metrics vs. sequence length, per dataset","af3_nwc":"Watson-Crick vs. non-Watson-Crick interactions (INF)"}'>
+            <div class="seg">
+              <button type="button" data-k="v" data-v="af3_abstract" aria-pressed="true">Overview</button>
+              <button type="button" data-k="v" data-v="af3_len" aria-pressed="false">vs. length</button>
+              <button type="button" data-k="v" data-v="af3_nwc" aria-pressed="false">Interactions</button>
+            </div>
+            <figure><button class="fig" type="button" aria-label="Enlarge figure"><img src="assets/img/af3_abstract.jpg" alt="" loading="lazy"><span>⤢</span></button><figcaption></figcaption></figure>
+          </div>
+        </div>
+      </article>
+
+      <!-- 03 State-of-the-RNArt -->
+      <article class="work" id="sotr">
+        <header class="work-top reveal">
+          <span class="work-n">03</span>
+          <div class="work-title">
+            <span class="badge preprint">NAR GENOMICS &amp; BIOINFORMATICS · 2024</span>
+            <h3>State-of-the-RNArt</h3>
+            <p>Benchmarking current methods for RNA 3D structure prediction.</p>
+          </div>
+          <div class="work-links">
+            <a class="btn sm" href="https://github.com/EvryRNA/state_of_the_rnart_viz" target="_blank" rel="noopener">GitHub ↗</a>
+            <a class="btn sm solid" href="https://doi.org/10.1093/nargab/lqae048" target="_blank" rel="noopener">Paper ↗</a>
+          </div>
+        </header>
+        <div class="work-cols reveal">
+          <div class="work-text">
+            <p>An open benchmark of RNA 3D structure prediction tools on three test sets: <b>RNA-Puzzles</b>, <b>CASP-RNA</b> and <b>RNASolo</b>. It has since been updated to include AlphaFold 3, alongside 10 other methods.</p>
+            <p>All predictions and metric scores are released with the code, so anyone can reproduce the figures or add a new method. Use the controls to explore the paper's figures by dataset.</p>
+          </div>
+          <div class="figbox" data-figs="assets/img/{p}_{d}.jpg" data-caps='{"polar":"Polar plot","box":"Box plots","heat":"Heatmaps","RNA_PUZZLES":"RNA-Puzzles","CASP_RNA":"CASP-RNA","RNASOLO":"RNASolo"}'>
+            <div class="seg">
+              <button type="button" data-k="d" data-v="RNA_PUZZLES" aria-pressed="true">RNA-Puzzles</button>
+              <button type="button" data-k="d" data-v="CASP_RNA" aria-pressed="false">CASP-RNA</button>
+              <button type="button" data-k="d" data-v="RNASOLO" aria-pressed="false">RNASolo</button>
+            </div>
+            <div class="seg">
+              <button type="button" data-k="p" data-v="polar" aria-pressed="true">Polar</button>
+              <button type="button" data-k="p" data-v="box" aria-pressed="false">Box plot</button>
+              <button type="button" data-k="p" data-v="heat" aria-pressed="false">Heatmap</button>
+            </div>
+            <figure><button class="fig" type="button" aria-label="Enlarge figure"><img src="assets/img/polar_RNA_PUZZLES.jpg" alt="" loading="lazy"><span>⤢</span></button><figcaption></figcaption></figure>
+          </div>
+        </div>
+      </article>
+    </div>
+
   </section>
 
   <section class="block" id="ai">
@@ -330,17 +496,14 @@
         <input class="search" id="pubSearch" type="search" placeholder="Search titles, authors, venues…" aria-label="Search publications">
         <div class="filters" role="group" aria-label="Filter publications">
           <button type="button" data-f="all" aria-pressed="true">All</button>
-          <button type="button" data-f="journal" aria-pressed="false">Journal</button>
-          <button type="button" data-f="conf" aria-pressed="false">Proceedings</button>
-          <button type="button" data-f="preprint" aria-pressed="false">Preprint</button>
+          <button type="button" data-f="method" aria-pressed="false">Methods</button>
+          <button type="button" data-f="benchmark" aria-pressed="false">Benchmarks</button>
           <span class="count" id="pubCount" aria-live="polite"></span>
         </div>
         <ul class="pubs" id="pubs">
-          <li class="pub" data-t="preprint"><span class="y">2025</span><div><p class="ttl">[Placeholder] A language-model approach to RNA 3D structure prediction</p><div class="au"><strong>Bernard C.</strong>, Martin L., Dubois A., et al.</div><div class="meta"><span class="badge preprint">PREPRINT</span><span class="venue">bioRxiv</span><a href="#research">DOI ↗</a></div></div></li>
-          <li class="pub" data-t="journal"><span class="y">2023</span><div><p class="ttl">[Placeholder] Benchmarking scoring functions for RNA 3D models</p><div class="au">Martin L., <strong>Bernard C.</strong>, Rossi G.</div><div class="meta"><span class="badge journal">JOURNAL</span><span class="venue">Nucleic Acids Research</span><span>· 58 citations</span><a href="#research">DOI ↗</a></div></div></li>
-          <li class="pub" data-t="journal"><span class="y">2019</span><div><p class="ttl">[Placeholder] Reinforcement learning for RNA structure refinement</p><div class="au"><strong>Bernard C.</strong>, Lefèvre P., Nguyen T., Garnier S.</div><div class="meta"><span class="badge journal">JOURNAL</span><span class="venue">ACS Synthetic Biology</span><span>· 112 citations</span><a href="#research">DOI ↗</a></div></div></li>
-          <li class="pub" data-t="conf"><span class="y">2018</span><div><p class="ttl">[Placeholder] Attention-based models for RNA secondary structure</p><div class="au"><strong>Bernard C.</strong>, Garnier S.</div><div class="meta"><span class="badge conf">PROCEEDINGS</span><span class="venue">Proc. SynBio Europe</span><a href="#research">DOI ↗</a></div></div></li>
-          <li class="pub" data-t="journal"><span class="y">2018</span><div><p class="ttl">[Placeholder] Evaluating deep learning predictions of RNA tertiary structure</p><div class="au">Nguyen T., <strong>Bernard C.</strong>, Lefèvre P., et al.</div><div class="meta"><span class="badge journal">JOURNAL</span><span class="venue">Nature Communications</span><span>· 96 citations</span><a href="#research">DOI ↗</a></div></div></li>
+          <li class="pub" data-t="method"><span class="y">2025</span><div><p class="ttl">RNA-TorsionBERT: leveraging language models for RNA 3D torsion angles prediction</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge journal">METHOD</span><span class="venue">Bioinformatics 41(1), btaf004</span><a href="https://doi.org/10.1093/bioinformatics/btaf004" target="_blank" rel="noopener">DOI ↗</a><a href="#torsionbert">Demo ↑</a></div></div></li>
+          <li class="pub" data-t="benchmark"><span class="y">2025</span><div><p class="ttl">Has AlphaFold3 achieved success for RNA?</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge conf">BENCHMARK</span><span class="venue">Acta Crystallographica Section D 81(2)</span><a href="https://doi.org/10.1107/S2059798325000592" target="_blank" rel="noopener">DOI ↗</a></div></div></li>
+          <li class="pub" data-t="benchmark"><span class="y">2024</span><div><p class="ttl">State-of-the-RNArt: benchmarking current methods for RNA 3D structure prediction</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge conf">BENCHMARK</span><span class="venue">NAR Genomics and Bioinformatics 6(2), lqae048</span><a href="https://doi.org/10.1093/nargab/lqae048" target="_blank" rel="noopener">DOI ↗</a></div></div></li>
         </ul>
         <p class="empty" id="pubEmpty" hidden>No publication matches that search.</p>
         <p style="margin-top:16px"><a class="link" href="https://scholar.google.com/" target="_blank" rel="noopener" style="font-weight:600">Full list on Google Scholar ↗</a></p>
@@ -357,7 +520,7 @@
         <div class="phd">
           <div class="k">PhD thesis · 2019</div>
           <h4>Deep learning for RNA 3D structure prediction</h4>
-          <p>Example University. Supervised by Prof. S. Garnier.</p>
+          <p>Includes RNA-TorsionBERT, the AlphaFold 3 benchmark and State-of-the-RNArt. <a href="#torsionbert" style="color:inherit;font-weight:600">See them above ↑</a></p>
         </div>
       </div>
     </div>
@@ -378,7 +541,7 @@
     <div class="projects">
       <a class="proj reveal" data-b="A" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><!-- swap for <img src="assets/img/your.gif" alt="..."> --><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Product · 2024</span><h3>Run-quality dashboard</h3><p>A shared view of synthesis runs across instruments so teams spot drift early.</p><span class="go">Read the case study <span class="arr">→</span></span></a>
       <a class="proj reveal" style="--d:.08s" data-b="T" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Automation · 2021</span><h3>Hands-free assay workflow</h3><p>Liquid-handling scripts that took a manual protocol to walk-away time.</p><span class="go">Read the case study <span class="arr">→</span></span></a>
-      <a class="proj reveal" data-b="C" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Research · PhD</span><h3>RNA 3D structure prediction</h3><p>Deep learning models and benchmarks for predicting how RNA folds in three dimensions.</p><span class="go">Read the paper <span class="arr">→</span></span></a>
+      <a class="proj reveal" data-b="C" href="#torsionbert"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Research · PhD</span><h3>RNA 3D structure prediction</h3><p>Deep learning models and benchmarks for predicting how RNA folds in three dimensions.</p><span class="go">See the thesis work <span class="arr">→</span></span></a>
       <a class="proj reveal" style="--d:.08s" data-b="G" href="#projects"><span class="glare" aria-hidden="true"></span><figure class="media"><div class="ph"><span class="play" aria-hidden="true">▶</span>GIF placeholder</div></figure><span class="k">Side project</span><h3>Primer calculator</h3><p>A small web tool for Tm and GC content that colleagues still use.</p><span class="go">Try it <span class="arr">→</span></span></a>
     </div>
   </section>
@@ -402,11 +565,15 @@
 <button class="icon-btn to-top" type="button" id="toTop" aria-label="Back to top">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
+<dialog class="lightbox" id="lightbox" aria-label="Figure"><button class="icon-btn lb-close" type="button" aria-label="Close">✕</button><img alt=""></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/main.js" defer></script>
 <script src="assets/rna-data.js" defer></script>
 <script src="assets/rna3d.js" defer></script>
 <script src="assets/ai.js" defer></script>
+<script src="assets/torsion-data.js" defer></script>
+<script src="assets/torsion.js" defer></script>
+<script src="assets/works.js" defer></script>
 </body>
 </html>
