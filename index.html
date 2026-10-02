@@ -238,7 +238,7 @@
           <a href="#torsionbert"><span>01</span> RNA-TorsionBERT</a>
           <a href="#af3"><span>02</span> AlphaFold 3 for RNA</a>
           <a href="#sotr"><span>03</span> State-of-the-RNArt</a>
-          <a href="#frames"><span>04</span> Frame prediction</a>
+          <a href="#frames"><span>04</span> Sequence to 3D (frames)</a>
         </nav>
       </div>
 
@@ -397,60 +397,72 @@
         </div>
       </article>
 
-      <!-- 04 Frame-based reconstruction -->
+      <!-- 04 Frame-based reconstruction (thesis chapter 6) -->
       <article class="work" id="frames">
         <header class="work-top reveal">
           <span class="work-n">04</span>
           <div class="work-title">
-            <span class="badge thesis">PHD THESIS</span>
-            <h3>Predicting nucleotide frames with language models</h3>
-            <p>Each nucleotide as a rigid body: predict its rotation and translation, then rebuild every atom.</p>
+            <span class="badge thesis">PHD THESIS · CHAPTER 6</span>
+            <h3>From sequence to 3D structure with frames</h3>
+            <p>A language-model-based network that predicts one rigid frame per nucleotide, AlphaFold 2 style, then rebuilds every atom.</p>
           </div>
         </header>
         <div class="work-cols reveal">
           <div class="work-text">
-            <p>Instead of predicting thousands of atom coordinates, the structure is described by <b>one frame per nucleotide</b>: a rotation matrix R<sub>i</sub> and a translation t<sub>i</sub>. A frame is defined from 3 or 4 atoms of the nucleotide. Placing an ideal, rigid nucleotide on each frame rebuilds the full-atom structure.</p>
-            <p>A <b>language model</b> reads the RNA sequence and predicts these rotations and translations. Extra heads also predict the quality of the resulting structure: <b>RMSD</b>, <b>INF</b> and <b>TM-score</b>, without needing the true structure.</p>
+            <p>Following AlphaFold 2, each nucleotide <i>i</i> gets a rigid frame F<sub>i</sub> = (R<sub>i</sub>, t<sub>i</sub>): a rotation R<sub>i</sub> ∈ SO(3) and a translation t<sub>i</sub>. A canonical nucleotide written in local coordinates is placed with x<sub>global</sub> = R<sub>i</sub> x<sub>local</sub> + t<sub>i</sub>. Every nucleotide is rebuilt <b>independently and in parallel</b>, so errors don't pile up along the chain the way they do with torsion angles, and multi-stranded RNAs are handled naturally.</p>
+            <p>The frame gives a <b>coarse-grained</b> model (3–4 atoms per nucleotide), which <b>Arena</b> then turns into a full-atom structure. Before training anything, I measured how much each representation loses by rebuilding structures from their <i>true</i> values. With the NuFold frame, frames were the most accurate modality.</p>
           </div>
           <div class="angles">
-            <span class="ctl-k">Reconstruction</span>
-            <p class="frame-eq">x<sub>atom</sub> = R<sub>i</sub> · x<sub>atom</sub><sup>local</sup> + t<sub>i</sub></p>
+            <span class="ctl-k">The model</span>
             <dl>
-              <div><dt>R<sub>i</sub></dt><dd>3 × 3 rotation: how nucleotide <i>i</i> is oriented.</dd></div>
-              <div><dt>t<sub>i</sub></dt><dd>Translation: where nucleotide <i>i</i> sits.</dd></div>
-              <div><dt>x<sup>local</sup></dt><dd>Atom coordinates of an ideal A, U, G or C, expressed in its own frame.</dd></div>
+              <div><dt>RNAEmbedder</dt><dd>A language model (RiNALMo, RNAErnie, RNABERT or DNABERT) embeds the sequence and builds a pair representation, replacing the MSA used by AlphaFold.</dd></div>
+              <div><dt>Pairformer</dt><dd>Triangle attention between the pair and sequence representations (from Boltz-1).</dd></div>
+              <div><dt>Structure Module</dt><dd>Starts from a black-hole initialisation and uses Invariant Point Attention, with recycling, to predict R<sub>i</sub>, t<sub>i</sub> and a pLDDT confidence per nucleotide.</dd></div>
+              <div><dt>Loss</dt><dd class="frame-eq sm">FAPE − 0.1·FAPE<sub>black-hole</sub> + 0.2·L<sub>dist</sub> + 0.1·L<sub>angles</sub> + 0.01·L<sub>pLDDT</sub></dd></div>
             </dl>
           </div>
         </div>
 
         <div class="tlab flab reveal" id="flab">
           <div class="tlab-head">
-            <h4>From sequence to frames to atoms</h4>
-            <p>Watch the pipeline on the tRNA: the model reads the sequence, frames fly from an identity pose to their predicted rotation and translation, then rigid nucleotides snap onto them. Add rotation or translation error to see how the RMSD, INF and TM-score respond.</p>
+            <h4>Watch the pipeline</h4>
+            <p>On the tRNA: the language model reads the sequence, the Pairformer refines it, then the Structure Module moves every frame out of the black hole over three recycling steps. The frame atoms give the coarse-grained model, and the full-atom structure follows.</p>
           </div>
-          <ol class="fpipe" aria-label="Pipeline steps">
+          <ol class="fpipe six" aria-label="Pipeline steps">
             <li data-step="1"><span>1</span>Sequence</li>
-            <li data-step="2"><span>2</span>Language model</li>
-            <li data-step="3"><span>3</span>Frame head · R<sub>i</sub>, t<sub>i</sub></li>
-            <li data-step="4"><span>4</span>Rigid nucleotides → atoms</li>
-            <li data-step="5"><span>5</span>Quality head · RMSD, INF, TM</li>
+            <li data-step="2"><span>2</span>RNAEmbedder (language model)</li>
+            <li data-step="3"><span>3</span>Pairformer</li>
+            <li data-step="4"><span>4</span>Structure Module · R<sub>i</sub>, t<sub>i</sub>, pLDDT</li>
+            <li data-step="5"><span>5</span>Coarse-grained (frame atoms)</li>
+            <li data-step="6"><span>6</span>All-atom (Arena)</li>
           </ol>
           <div class="ftokens" id="flTokens" aria-hidden="true"></div>
           <div class="tlab-grid">
             <div class="tlab-stage">
               <canvas id="flCanvas" tabindex="0" aria-label="Frame-based reconstruction of a tRNA. Drag or use the arrow keys to rotate."></canvas>
-              <div class="tlab-legend" aria-hidden="true"><span><i class="ln" style="background:var(--a)"></i>x</span><span><i class="ln" style="background:var(--c)"></i>y</span><span><i class="ln" style="background:var(--t)"></i>z frame axes</span></div>
+              <div class="tlab-legend" aria-hidden="true"><span><i class="ln" style="background:var(--a)"></i>x</span><span><i class="ln" style="background:var(--c)"></i>y</span><span><i class="ln" style="background:var(--t)"></i>z frame axes</span><span class="lddt-key"><i class="ln lddt"></i>lDDT 0 → 1</span></div>
+              <p class="fl-status" id="flRecycle" aria-live="polite"></p>
             </div>
             <div class="tlab-panel">
               <div class="ctl row"><button class="btn solid sm" type="button" id="flPlay">▶ Play the pipeline</button><button class="chip-btn" type="button" id="flSpin" aria-pressed="true">Pause spin</button></div>
               <div class="ctl">
-                <span class="ctl-k">Frame built from</span>
-                <div class="seg"><button type="button" data-fmode="3" aria-pressed="true">3 atoms</button><button type="button" data-fmode="4" aria-pressed="false">4 atoms</button></div>
-                <p class="tl-def" id="flAtoms">P · C4′ · N1/N9  (Gram-Schmidt)</p>
+                <span class="ctl-k">Frame representation</span>
+                <div class="seg wrap">
+                  <button type="button" data-frep="nufold" aria-pressed="true">NuFold</button>
+                  <button type="button" data-frep="reduced" aria-pressed="false">Custom reduced</button>
+                  <button type="button" data-frep="rhofold" aria-pressed="false">RhoFold</button>
+                  <button type="button" data-frep="custom" aria-pressed="false">Custom</button>
+                  <button type="button" data-frep="deepfold" aria-pressed="false">DeepFoldRNA</button>
+                </div>
+                <p class="tl-def" id="flAtoms"></p>
               </div>
               <div class="ctl">
-                <span class="ctl-k">Show</span>
-                <div class="ctl row"><button class="chip-btn" type="button" data-fview="frames" aria-pressed="true">Frames</button><button class="chip-btn" type="button" data-fview="atoms" aria-pressed="true">Atoms</button></div>
+                <span class="ctl-k">Show · colour by</span>
+                <div class="ctl row">
+                  <button class="chip-btn" type="button" data-fview="frames" aria-pressed="true">Frames</button>
+                  <button class="chip-btn" type="button" data-fview="atoms" aria-pressed="true">Atoms</button>
+                  <div class="seg"><button type="button" data-fcol="nuc" aria-pressed="true">Nucleotide</button><button type="button" data-fcol="lddt" aria-pressed="false">lDDT</button></div>
+                </div>
               </div>
               <div class="ctl">
                 <label class="ctl-k" for="flRot">Rotation error <b id="flRotV">0°</b></label>
@@ -459,16 +471,38 @@
                 <div class="fold-row"><input type="range" id="flTr" min="0" max="40" value="0"><button class="chip-btn" type="button" id="flReseed">New noise</button></div>
               </div>
               <div class="quality">
-                <span class="ctl-k">Quality (vs. the crystal structure)</span>
-                <div class="readouts three">
+                <span class="ctl-k">Evaluation vs. the crystal structure</span>
+                <div class="readouts four">
                   <div><b id="flRmsd">0 Å</b><span>RMSD ↓</span></div>
                   <div><b id="flInf">0</b><span>INF ↑</span></div>
                   <div><b id="flTm">0</b><span>TM-score ↑</span></div>
+                  <div><b id="flLddt">0</b><span>mean lDDT ↑</span></div>
                 </div>
               </div>
             </div>
           </div>
-          <p class="fine">Illustration on the tRNA (PDB 1EHZ): frames are taken from the crystal structure rather than predicted, and each nucleotide uses a template averaged over the tRNA's own A, U, G and C. Even with perfect frames, rigid templates leave about 0.8 Å RMSD. In the real model the quality head estimates these scores from the sequence alone; here they are computed against the crystal structure. INF compares base pairs (Watson-Crick and G·U), and TM-score uses C4′ atoms with the RNA-align d₀ after superposition. Try it: rotation errors barely move the C4′ trace (the frame origin), so TM-score stays high while base pairs break and INF collapses. Translation errors hurt all three.</p>
+          <p class="fine">Simplified demo on the tRNA (PDB 1EHZ). The frames come from the crystal structure rather than from the model. The all-atom step places a rigid, averaged nucleotide on each frame instead of running Arena, so the ranking of representations here differs from the thesis. The pLDDT head learns to predict lDDT; here the true per-nucleotide lDDT (on C4′) is shown instead. Rotation errors barely move the frame origins, so TM-score stays high while base pairs break and INF drops. Translation errors hurt every metric.</p>
+        </div>
+
+        <div class="modchart reveal" id="modChart">
+          <div class="mc-head">
+            <div><h4>Which representation loses the least?</h4><p>Structures rebuilt from the <i>true</i> values of each modality, then converted to all-atom with Arena, on RNA-Puzzles, CASP-RNA and RNASolo (thesis Table 6.2, mean ± s.d.).</p></div>
+            <div class="mc-ctl">
+              <div class="seg" role="group" aria-label="Metric">
+                <button type="button" data-mc="rmsd" aria-pressed="true">RMSD</button><button type="button" data-mc="inf" aria-pressed="false">INF</button><button type="button" data-mc="tm" aria-pressed="false">TM-score</button><button type="button" data-mc="mcq" aria-pressed="false">MCQ</button><button type="button" data-mc="clash" aria-pressed="false">Clash</button>
+              </div>
+              <button class="chip-btn" type="button" id="mcTable" aria-pressed="false">Show table</button>
+            </div>
+          </div>
+          <div class="mc-plot"><svg role="img" aria-label="Bar chart of reconstruction quality per modality"></svg><div class="mc-tip" hidden></div></div>
+          <p class="fine mc-note"></p>
+          <div class="mc-table-wrap"><table class="mc-table" hidden></table></div>
+          <p class="fine">Frames give the best RMSD, INF, TM-score and clash score. Torsion angles (with true bond angles) keep local geometry better (MCQ) but struggle with multi-stranded RNAs. Among frame representations, NuFold (O4′, C1′, C2′, N) scored best, followed by Custom reduced, though the differences were not significant.</p>
+        </div>
+
+        <div class="status-card reveal">
+          <span class="badge pre">STATUS</span>
+          <p><b>Work in progress.</b> Trained on 1,005 structures (RNASolo + RNA3DB split) and 15,198 filtered synthetic structures (RFdiffusion, ranked with N-META), the model overfits a single structure but does not yet generalise: validation TM-scores stayed below 0.2 and predictions tend towards helix-like shapes. The reconstruction study above holds independently of this, and the model remains a sequence-only, MSA-free starting point.</p>
         </div>
       </article>
     </div>
