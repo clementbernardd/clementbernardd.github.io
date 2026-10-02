@@ -43,3 +43,7 @@ python3 -m http.server 8000
 ## Updating citation numbers
 
 The Research stats and per-paper citation counts are static, copied from Google Scholar on 1 October 2026. Update them in `index.html` (search for `data-count` and `citations`).
+
+## Cache busting
+
+`tools/version_assets.py` stamps every CSS/JS link in `index.html` with a content hash (`?v=...`) so browsers never mix a new page with an old cached script. The deploy workflow runs it automatically; run `python3 tools/version_assets.py` yourself when previewing locally after editing assets.

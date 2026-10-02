@@ -23,6 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      - name: Version asset links (cache busting)
+        run: python3 tools/version_assets.py
       - name: Collect site files
         run: |
           mkdir _site

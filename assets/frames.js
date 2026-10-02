@@ -205,12 +205,10 @@
     root.classList.toggle("in3d", s >= 3);
     if (s === 3) { curFape = fape(poses()); const u = (tl - START[3]) / REC; statusEl.textContent = u < 0.08 ? "4 · Structure Module: black-hole initialisation, every frame at the origin (R = I, t = 0)" : `4 · Structure Module · recycle ${Math.min(3, Math.floor(u) + 1)} / 3 · FAPE ${curFape.toFixed(2)}`; }
     else statusEl.textContent = done ? "Done. Drag to rotate, or change the representation, colours and errors" : STATUS[s];
-    const q = ease(local(6));
-    $("#flRmsd").textContent = (metrics.rmsd * q).toFixed(2) + " Å";
-    $("#flInf").textContent = (metrics.inf * q).toFixed(2);
-    $("#flTm").textContent = (metrics.tm * q).toFixed(2);
-    $("#flLddt").textContent = (metrics.lddt * q).toFixed(2);
-    root.style.setProperty("--qa", q.toFixed(3));
+    const pending = playing && tl < START[6], q = playing ? ease(local(6)) : 1;
+    const show = (id, v, unit = "") => ($(id).textContent = pending ? "…" : (v * q).toFixed(2) + unit);
+    show("#flRmsd", metrics.rmsd, " Å"); show("#flInf", metrics.inf); show("#flTm", metrics.tm); show("#flLddt", metrics.lddt);
+    root.style.setProperty("--qa", pending ? "0" : "1");
     scrub.value = Math.round((tl / T_END) * 1000);
     playB.textContent = playing ? "❚❚ Pause" : done ? "↻ Replay" : "▶ Play";
     playB.setAttribute("aria-pressed", String(playing));
@@ -331,17 +329,18 @@
     requestAnimationFrame(frame);
   }
   const kick = () => { if (!loop && visible) { loop = true; lastNow = 0; requestAnimationFrame(frame); } };
-  function play(from) {
-    if (reduced) { tl = T_END; playing = false; syncDom(); dirty = true; kick(); return; }
+  function play(from, auto) {
+    if (auto && reduced) { tl = T_END; playing = false; syncDom(); dirty = true; kick(); return; } // a click always plays
     if (from != null) tl = from; else if (tl >= T_END) tl = 0;
     playing = true; syncDom(); kick();
   }
   function pause() { playing = false; syncDom(); }
+  function toResult() { if (tl < T_END || playing) { playing = false; tl = T_END; camR = maxR; } }
   function seek(t) { tl = Math.min(Math.max(t, 0), T_END); camR = maxR; syncDom(); dirty = true; kick(); }
   let autoplayed = false;
   new IntersectionObserver(([en]) => {
     visible = en.isIntersecting;
-    if (en.intersectionRatio >= 0.55 && !autoplayed) { autoplayed = true; play(0); }
+    if (en.intersectionRatio >= 0.55 && !autoplayed) { autoplayed = true; play(0, true); }
     if (!en.isIntersecting && playing) pause(); // don't run unseen; resume with Play
     kick();
   }, { threshold: [0, 0.55] }).observe(cv);
@@ -370,7 +369,7 @@
     el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
   });
   const repB = $$("[data-frep]");
-  repB.forEach((b) => b.addEventListener("click", () => { rep = b.dataset.frep; press(repB, b); computeFrames(); syncDom(); kick(); }));
+  repB.forEach((b) => b.addEventListener("click", () => { rep = b.dataset.frep; press(repB, b); toResult(); computeFrames(); syncDom(); kick(); }));
   const colB = $$("[data-fcol]");
   colB.forEach((b) => b.addEventListener("click", () => {
     colorBy = b.dataset.fcol; press(colB, b); root.dataset.color = colorBy;
@@ -382,9 +381,9 @@
     if (b.dataset.fview === "frames") showFrames = on; else showAtoms = on;
     dirty = true; kick();
   }));
-  $("#flRot").addEventListener("input", (e) => { sigR = +e.target.value; $("#flRotV").textContent = sigR + "°"; computeFrames(); syncDom(); kick(); });
-  $("#flTr").addEventListener("input", (e) => { sigT = +e.target.value / 10; $("#flTrV").textContent = sigT.toFixed(1) + " Å"; computeFrames(); syncDom(); kick(); });
-  $("#flReseed").addEventListener("click", () => { reseed(); computeFrames(); syncDom(); kick(); });
+  $("#flRot").addEventListener("input", (e) => { sigR = +e.target.value; $("#flRotV").textContent = sigR + "°"; toResult(); computeFrames(); syncDom(); kick(); });
+  $("#flTr").addEventListener("input", (e) => { sigT = +e.target.value / 10; $("#flTrV").textContent = sigT.toFixed(1) + " Å"; toResult(); computeFrames(); syncDom(); kick(); });
+  $("#flReseed").addEventListener("click", () => { reseed(); toResult(); computeFrames(); syncDom(); kick(); });
   $("#flSpin").addEventListener("click", (e) => { spin = !spin; e.target.setAttribute("aria-pressed", String(spin)); e.target.textContent = spin ? "Pause spin" : "Spin"; kick(); });
 
   new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });

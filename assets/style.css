@@ -502,7 +502,7 @@ button.tok.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .ftok{font-family:var(--mono);font-size:.62rem;font-weight:600;width:14px;height:16px;border-radius:4px;display:grid;place-items:center;background:var(--line);color:var(--muted);transition:background .25s,color .25s,transform .25s}
 .ftok.read{color:var(--fg);background:color-mix(in srgb,var(--fg) 14%,var(--bg))}
 .ftok.placed.A{background:var(--a);color:#fff} .ftok.placed.U{background:var(--t);color:#fff} .ftok.placed.G{background:var(--g);color:var(--on-g)} .ftok.placed.C{background:var(--c);color:#fff}
-.quality .readouts{opacity:calc(.35 + var(--qa,1) * .65);transition:opacity .2s}
+.quality .readouts{opacity:calc(.4 + var(--qa,1) * .6);transition:opacity .2s}
 
 
 .fpipe.six{grid-template-columns:repeat(6,minmax(0,1fr))}
