@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=5a93f0f3">
+<link rel="stylesheet" href="assets/style.css?v=3c44bdea">
 </head>
 <body>
 <a class="skip" href="#about">Skip to content</a>
@@ -414,22 +414,47 @@
         </header>
         <div class="work-cols reveal">
           <div class="work-text">
-            <p>An open benchmark of RNA 3D structure prediction tools on three test sets: <b>RNA-Puzzles</b>, <b>CASP-RNA</b> and <b>RNASolo</b>. It has since been updated to include AlphaFold 3, alongside 10 other methods.</p>
-            <p>All predictions and metric scores are released with the code, so anyone can reproduce the figures or add a new method. Use the controls to explore the paper's figures by dataset.</p>
+            <p>An open benchmark of RNA 3D structure prediction tools on three test sets: <b>RNA-Puzzles</b>, <b>CASP-RNA</b> and <b>RNASolo</b>. It has since been updated to include AlphaFold 3, alongside the template-based, ab initio and deep learning methods.</p>
+            <p>All predictions and metric scores are released with the code, so anyone can reproduce the figures or add a new method. The chart below is drawn live from those released scores.</p>
           </div>
-          <div class="figbox" data-figs="assets/img/{p}_{d}.jpg" data-caps='{"polar":"Polar plot","box":"Box plots","heat":"Heatmaps","RNA_PUZZLES":"RNA-Puzzles","CASP_RNA":"CASP-RNA","RNASOLO":"RNASolo"}'>
-            <div class="seg">
-              <button type="button" data-k="d" data-v="RNA_PUZZLES" aria-pressed="true">RNA-Puzzles</button>
-              <button type="button" data-k="d" data-v="CASP_RNA" aria-pressed="false">CASP-RNA</button>
-              <button type="button" data-k="d" data-v="RNASOLO" aria-pressed="false">RNASolo</button>
-            </div>
-            <div class="seg">
-              <button type="button" data-k="p" data-v="polar" aria-pressed="true">Polar</button>
-              <button type="button" data-k="p" data-v="box" aria-pressed="false">Box plot</button>
-              <button type="button" data-k="p" data-v="heat" aria-pressed="false">Heatmap</button>
-            </div>
-            <figure><button class="fig" type="button" aria-label="Enlarge figure"><img src="assets/img/polar_RNA_PUZZLES.jpg" alt="" loading="lazy"><span>⤢</span></button><figcaption></figcaption></figure>
+          <div class="glance">
+            <div><b>3</b><span>test sets</span></div>
+            <div><b>63</b><span>RNA targets</span></div>
+            <div><b>10</b><span>methods</span></div>
+            <div><b>8</b><span>metrics</span></div>
           </div>
+        </div>
+        <div class="sotr-chart reveal" id="sotrChart">
+          <div class="sc-head">
+            <div class="sc-ctl">
+              <div class="seg" role="group" aria-label="Test set">
+                <button type="button" data-sds="RNA_PUZZLES" aria-pressed="true">RNA-Puzzles <i></i></button>
+                <button type="button" data-sds="CASP_RNA" aria-pressed="false">CASP-RNA <i></i></button>
+                <button type="button" data-sds="RNASOLO" aria-pressed="false">RNASolo <i></i></button>
+              </div>
+              <div class="seg wrap" role="group" aria-label="Metric">
+                <button type="button" data-smet="overall" aria-pressed="true">Overall</button>
+                <button type="button" data-smet="rmsd" aria-pressed="false">RMSD</button>
+                <button type="button" data-smet="tm" aria-pressed="false">TM-score</button>
+                <button type="button" data-smet="lddt" aria-pressed="false">lDDT</button>
+                <button type="button" data-smet="inf" aria-pressed="false">INF</button>
+                <button type="button" data-smet="gdt" aria-pressed="false">GDT-TS</button>
+                <button type="button" data-smet="ermsd" aria-pressed="false">εRMSD</button>
+                <button type="button" data-smet="mcq" aria-pressed="false">MCQ</button>
+                <button type="button" data-smet="cad" aria-pressed="false">CAD</button>
+              </div>
+            </div>
+            <div class="sc-legend" role="group" aria-label="Highlight a method family">
+              <button type="button" data-sfam="dl" aria-pressed="false"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5"/></svg>Deep learning</button>
+              <button type="button" data-sfam="tb" aria-pressed="false"><svg viewBox="0 0 12 12" aria-hidden="true"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5"/></svg>Template-based</button>
+              <button type="button" data-sfam="ai" aria-pressed="false"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 0.5 L11.5 6 L6 11.5 L0.5 6 Z"/></svg>Ab initio</button>
+              <button class="chip-btn" type="button" id="scTable" aria-pressed="false">Show table</button>
+            </div>
+          </div>
+          <div class="sc-plot"><svg role="img" aria-label="Methods ranked by the selected metric on the selected test set"></svg><div class="sc-tip" hidden></div></div>
+          <p class="fine sc-note"></p>
+          <div class="mc-table-wrap"><table class="mc-table" hidden></table></div>
+          <p class="fine">For each target, the best-RMSD model of each method is kept, then scores are averaged over the targets that method predicted (as in the paper). Faded rows cover fewer than half of the targets. Source: <a class="link" href="https://github.com/EvryRNA/state_of_the_rnart_viz" target="_blank" rel="noopener">state_of_the_rnart_viz</a>.</p>
         </div>
       </article>
 
@@ -867,6 +892,8 @@
 <script src="assets/frames-data.js?v=dc44467d" defer></script>
 <script src="assets/frames.js?v=219e2182" defer></script>
 <script src="assets/works.js?v=5fb8beac" defer></script>
+<script src="assets/sotr-data.js?v=fbe88bc2" defer></script>
+<script src="assets/sotr.js?v=23a72e3b" defer></script>
 <script src="assets/projects.js?v=85c99b92" defer></script>
 </body>
 </html>

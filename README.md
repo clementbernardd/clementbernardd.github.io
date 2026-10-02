@@ -14,6 +14,8 @@ assets/torsion-data.js  tRNA 1EHZ backbone atoms, torsions, mean bond lengths/an
 assets/frames.js    frame-based reconstruction demo (rigid nucleotides on R, t frames + RMSD/INF/TM)
 assets/frames-data.js  tRNA 1EHZ heavy atoms, frames and averaged nucleotide templates
 assets/works.js     figure switchers + lightbox for the thesis works
+assets/sotr.js      State-of-the-RNArt explorer (ranking per metric and test set)
+assets/sotr-data.js scores from EvryRNA/state_of_the_rnart_viz (best-RMSD model per method and target)
 assets/img/         figures from the EvryRNA repos (resized for the web)
 assets/projects.js  tutorials, projects, teaching demo (2D superposition), publication sorting
 assets/media/       project/tutorial previews (GIFs converted to MP4 + poster frames)
