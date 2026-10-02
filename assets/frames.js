@@ -133,43 +133,92 @@
     dirty = true;
   }
 
-  // timeline (s): sequence, language model, Pairformer, Structure Module with 3 recycles from the black hole,
-  // coarse-grained frame atoms, all-atom reconstruction, then evaluation
-  const T = { seq: 0.9, lm: 0.9, pair: 0.9, rec: 1.25, cg: 0.8, aa: 1.0, ev: 0.8 };
-  const t0 = { seq: 0 }; t0.lm = T.seq; t0.pair = t0.lm + T.lm; t0.sm = t0.pair + T.pair; t0.cg = t0.sm + 3 * T.rec; t0.aa = t0.cg + T.cg; t0.ev = t0.aa + T.aa;
-  const T_END = t0.ev + T.ev;
-  let tl = T_END, playing = 0;
+  // ---------- timeline (seconds) ----------
+  // 1 sequence · 2 RNAEmbedder (tokens → embeddings → pair representation) · 3 Pairformer (pair map sharpens)
+  // 4 Structure Module: 3 recycles out of the black hole · 5 coarse-grained frame atoms · 6 all-atom · then evaluation
+  const DUR = [1.4, 2.0, 2.2, 3 * 1.8, 1.6, 1.6, 1.0];
+  const START = DUR.reduce((a, d, i) => (a.push(a[i] + d), a), [0]); // START[s] = start of step s+1 (index 6 = evaluation)
+  const T_END = START[7], REC = DUR[3] / 3;
+  let tl = T_END, playing = false, lastNow = 0;
   const clamp = (x) => Math.min(Math.max(x, 0), 1), ease = (x) => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-  const HOPS = [[0, 1], [0.45, 0.55], [0.82, 0.22], [1, 0]]; // [fraction of the way to the final frame, remaining wobble]
-  function hopState(i) { // where the Structure Module has moved frame i so far
-    const u = (tl - t0.sm) / T.rec;
+  const stepAt = (t) => { for (let s = 6; s >= 0; s--) if (t >= START[s]) return s; return 0; };
+  const local = (s) => clamp((tl - START[s]) / DUR[s]);
+  const HOPS = [[0, 0], [0.6, 0.32], [0.9, 0.1], [1, 0]]; // [fraction of the final pose, remaining error] after each recycle
+  function hopState(i) {
+    const u = (tl - START[3]) / REC;
     if (u <= 0) return { f: 0, w: 0 };
     if (u >= 3) return { f: 1, w: 0 };
-    const h = Math.floor(u), e = ease(clamp((u - h) * 1.15 - (i / n) * 0.15));
+    const h = Math.floor(u), e = ease(clamp((u - h) * 1.2 - (i / n) * 0.2));
     const [f0, w0] = HOPS[h], [f1, w1] = HOPS[h + 1];
-    return { f: f0 + (f1 - f0) * e, w: h === 0 ? w1 * e : w0 + (w1 - w0) * e };
+    return { f: f0 + (f1 - f0) * e, w: w0 + (w1 - w0) * e };
   }
-  const cgA = () => clamp((tl - t0.cg) / T.cg), aaA = () => clamp((tl - t0.aa) / T.aa), evA = () => ease(clamp((tl - t0.ev) / T.ev));
 
-  const stepEls = $$("[data-step]"), tokEls = [], strip = $("#flTokens"), recEl = $("#flRecycle");
-  D.seq.split("").forEach((b) => { const s = document.createElement("span"); s.className = "ftok " + b; s.textContent = b; strip.appendChild(s); tokEls.push(s); });
+  // native C4′ distance map: what the pair representation should come to encode
+  const dmap = c4.map((a) => c4.map((b) => dist(nat[a], nat[b])));
+  let pnoise = [], emb = [];
+  function pairNoise() {
+    let s = 99; const r = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+    emb = D.bases.map(() => Array.from({ length: 6 }, r));
+    pnoise = c4.map((_, i) => c4.map((_, j) => (emb[i][j % 6] + emb[j][i % 6]) / 2));
+  }
+  pairNoise();
+
+  // poses of the frames at the current time
+  function poses() {
+    return frames.map((f, i) => {
+      const { f: e, w } = hopState(i);
+      let Rm = e >= 1 && w === 0 ? f.R : fromQuat(slerpId(f.q, e)), t = scl(f.t, e);
+      if (w > 0) { const z = wobble[i]; Rm = mm(axisAngle(z.ax, z.ang * w * 0.6), Rm); t = add(t, scl(z.t, w * 3)); }
+      return { R: Rm, t };
+    });
+  }
+  // FAPE on frame origins (AlphaFold 2 style: express every point in every frame, clamp at 10 Å, divide by 10)
+  function fape(P) {
+    let s = 0;
+    for (let i = 0; i < n; i++) {
+      const Ri = P[i].R, ti = P[i].t, Rt = frames[i].R, tt = frames[i].t;
+      for (let j = 0; j < n; j++) {
+        const a = [P[j].t[0] - ti[0], P[j].t[1] - ti[1], P[j].t[2] - ti[2]], b = [frames[j].t[0] - tt[0], frames[j].t[1] - tt[1], frames[j].t[2] - tt[2]];
+        const la = [Ri[0][0] * a[0] + Ri[1][0] * a[1] + Ri[2][0] * a[2], Ri[0][1] * a[0] + Ri[1][1] * a[1] + Ri[2][1] * a[2], Ri[0][2] * a[0] + Ri[1][2] * a[1] + Ri[2][2] * a[2]];
+        const lb = [Rt[0][0] * b[0] + Rt[1][0] * b[1] + Rt[2][0] * b[2], Rt[0][1] * b[0] + Rt[1][1] * b[1] + Rt[2][1] * b[2], Rt[0][2] * b[0] + Rt[1][2] * b[1] + Rt[2][2] * b[2]];
+        s += Math.min(10, Math.sqrt((la[0] - lb[0]) ** 2 + (la[1] - lb[1]) ** 2 + (la[2] - lb[2]) ** 2 + 1e-4));
+      }
+    }
+    return s / (n * n) / 10;
+  }
+
+  // ---------- DOM sync ----------
+  const stepEls = $$("[data-step]"), statusEl = $("#flRecycle"), scrub = $("#flScrub"), playB = $("#flPlay");
+  const STATUS = [
+    "1 · The RNA sequence, one token per nucleotide",
+    "2 · RNAEmbedder: the language model turns each token into an embedding, then builds a pair representation",
+    "3 · Pairformer: triangle attention refines the pair representation (shown here as the C4′ distance map it learns)",
+    "", // structure module, filled in live
+    "5 · Coarse-grained model: the frame atoms of each nucleotide",
+    "6 · All-atom structure (Arena in the thesis, rigid nucleotides here)",
+    "Evaluation against the crystal structure",
+  ];
+  let curFape = 0;
   function syncDom() {
-    const stage = tl < t0.lm ? 1 : tl < t0.pair ? 2 : tl < t0.sm ? 3 : tl < t0.cg ? 4 : tl < t0.aa ? 5 : 6;
-    stepEls.forEach((el) => { const s = +el.dataset.step; el.classList.toggle("on", s === stage && tl < T_END); el.classList.toggle("done", s < stage || tl >= T_END); });
-    const read = clamp(tl / T.seq), emb = clamp((tl - t0.lm) / T.lm);
-    tokEls.forEach((el, i) => { el.classList.toggle("read", i / n < read); el.classList.toggle("emb", i / n < emb); el.classList.toggle("placed", hopState(i).f >= 1); });
-    const u = (tl - t0.sm) / T.rec;
-    recEl.textContent = u <= 0 ? "Black-hole initialisation: every frame at the origin, R = I, t = 0" : u < 3 ? `Structure Module · recycle ${Math.floor(u) + 1} / 3` : tl < t0.aa ? "Coarse-grained model: frame atoms only" : "All-atom structure";
-    const q = evA();
+    const s = stepAt(tl), done = tl >= T_END;
+    stepEls.forEach((el) => { const k = +el.dataset.step - 1; el.classList.toggle("on", k === s && !done); el.classList.toggle("done", k < s || done); el.setAttribute("aria-current", k === s && !done ? "step" : "false"); });
+    root.classList.toggle("in3d", s >= 3);
+    if (s === 3) { curFape = fape(poses()); const u = (tl - START[3]) / REC; statusEl.textContent = u < 0.08 ? "4 · Structure Module: black-hole initialisation, every frame at the origin (R = I, t = 0)" : `4 · Structure Module · recycle ${Math.min(3, Math.floor(u) + 1)} / 3 · FAPE ${curFape.toFixed(2)}`; }
+    else statusEl.textContent = done ? "Done. Drag to rotate, or change the representation, colours and errors" : STATUS[s];
+    const q = ease(local(6));
     $("#flRmsd").textContent = (metrics.rmsd * q).toFixed(2) + " Å";
     $("#flInf").textContent = (metrics.inf * q).toFixed(2);
     $("#flTm").textContent = (metrics.tm * q).toFixed(2);
     $("#flLddt").textContent = (metrics.lddt * q).toFixed(2);
     root.style.setProperty("--qa", q.toFixed(3));
+    scrub.value = Math.round((tl / T_END) * 1000);
+    playB.textContent = playing ? "❚❚ Pause" : done ? "↻ Replay" : "▶ Play";
+    playB.setAttribute("aria-pressed", String(playing));
   }
 
-  // view
+  // ---------- view ----------
   let V = mm(rot(0, 0.9), rot(-0.35, 0)), zoom = 1, W = 0, H = 0, dpr = 1, spin = !reduced, drag = false, last = null, visible = false, loop = false, dirty = true;
+  let camR = maxR; // camera radius, follows the extent of the frames so the black hole is readable
   function rot(ax, ay) {
     const cx = Math.cos(ax), sx = Math.sin(ax), cy = Math.cos(ay), sy = Math.sin(ay);
     return mm([[cy, 0, sy], [0, 1, 0], [-sy, 0, cy]], [[1, 0, 0], [0, cx, -sx], [0, sx, cx]]);
@@ -177,39 +226,77 @@
   function resize() { const r = cv.getBoundingClientRect(); dpr = Math.min(devicePixelRatio || 1, 2); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; dirty = true; }
   new ResizeObserver(resize).observe(cv);
 
+  function drawPair(alpha) { // steps 1–3 drawn flat: tokens, embeddings, pair representation
+    const s = stepAt(tl), pad = 18, tokW = Math.min(9, (W - 2 * pad) / n), x0 = (W - tokW * n) / 2, yTok = 30;
+    ctx.globalAlpha = alpha;
+    ctx.font = `600 ${Math.max(6, tokW - 1)}px 'JetBrains Mono', monospace`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const read = s === 0 ? local(0) : 1;
+    for (let i = 0; i < n; i++) {
+      const on = i / n < read, x = x0 + i * tokW;
+      ctx.fillStyle = rgb(on ? baseCol(D.bases[i]) : col.line); ctx.fillRect(x + 0.5, yTok, tokW - 1, tokW + 3);
+      if (tokW >= 7) { ctx.fillStyle = on ? "#fff" : rgb(col.muted); ctx.fillText(D.bases[i], x + tokW / 2, yTok + (tokW + 3) / 2); }
+    }
+    if (s >= 1) { // embeddings: a column of features under each token
+      const e = s === 1 ? clamp(local(1) / 0.45) : 1, y = yTok + tokW + 10;
+      for (let i = 0; i < n; i++) {
+        if (i / n > e) break;
+        for (let k = 0; k < 6; k++) { ctx.fillStyle = rgb(mix(col.bg, col.t, 0.25 + emb[i][k] * 0.75)); ctx.fillRect(x0 + i * tokW + 0.5, y + k * 4, tokW - 1, 3); }
+      }
+    }
+    if (s >= 1) { // pair representation L × L: noisy outer product, then sharpened by the Pairformer
+      const appear = s === 1 ? clamp((local(1) - 0.4) / 0.5) : 1, sharp = s === 1 ? 0 : s === 2 ? ease(local(2)) : 1;
+      const yM = yTok + tokW + 44, size = Math.min(W - 2 * pad, H - yM - 40), cell = size / n, xM = (W - size) / 2;
+      ctx.globalAlpha = alpha * appear;
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+        const v = (1 - sharp) * pnoise[i][j] * 0.55 + sharp * Math.exp(-dmap[i][j] / 9);
+        ctx.fillStyle = rgb(mix(col.bg, col.t, Math.min(1, v * 1.1)));
+        ctx.fillRect(xM + j * cell, yM + i * cell, cell + 0.3, cell + 0.3);
+      }
+      ctx.globalAlpha = alpha * appear;
+      ctx.font = "600 10px 'JetBrains Mono', monospace"; ctx.fillStyle = rgb(col.muted); ctx.textAlign = "left";
+      ctx.fillText(s >= 2 ? "pair representation → C4′ distance map" : "pair representation (L × L)", xM, yM + size + 14);
+    }
+    ctx.globalAlpha = 1; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  }
+
   function draw() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     if (!W) return;
-    const fit = Math.min(W, H) * 0.44 / maxR * zoom, Dc = maxR * 4;
-    const pr = (p) => { const q = mv(V, p), s = Dc / (Dc + q[2]); return [W / 2 + q[0] * fit * s, H / 2 - q[1] * fit * s, q[2], s]; };
-    const depth = (z) => clamp((z + maxR) / (2 * maxR)) * 0.6;
-    const Rp = D.reps[rep];
-    const poses = frames.map((f, i) => {
-      const { f: e, w } = hopState(i);
-      let Rm = e >= 1 && w === 0 ? f.R : fromQuat(slerpId(f.q, e)), t = scl(f.t, e);
-      if (w > 0) { const z = wobble[i]; Rm = mm(axisAngle(z.ax, z.ang * w * 0.9), Rm); t = add(t, scl(z.t, w * 6)); }
-      return { R: Rm, t };
-    });
+    const s = stepAt(tl);
+    // 2D model view for steps 1–3, cross-fading into the 3D view at the start of step 4
+    const fade3d = s < 3 ? 0 : clamp((tl - START[3]) / 0.5);
+    if (s < 3 || fade3d < 1) drawPair(1 - fade3d);
+    if (s < 3) return;
+    const P = poses(), Rp = D.reps[rep];
+    const ext = Math.max(8, ...P.map((p) => Math.hypot(...p.t))) + 6;
+    camR += (Math.min(maxR, ext) - camR) * (playing ? 0.12 : 1);
+    const fit = Math.min(W, H) * 0.42 / camR * zoom, Dc = maxR * 4;
+    const pr = (p) => { const q = mv(V, p), sc = Dc / (Dc + q[2]); return [W / 2 + q[0] * fit * sc, H / 2 + 10 - q[1] * fit * sc, q[2], sc]; };
+    const depth = (z) => clamp((z + camR) / (2 * camR)) * 0.55;
     const res = (i) => (colorBy === "lddt" ? lddtCol(lddtRes[i]) : baseCol(D.bases[i]));
-    const items = [], cg = cgA(), aa = aaA();
+    const items = [], cg = clamp((tl - START[4]) / 0.8), aa = clamp((tl - START[5]) / 0.9);
+    ctx.globalAlpha = fade3d;
+    // backbone trace through the frame origins, so the fold is readable before atoms appear
+    if (aa < 1) for (let i = 0; i < n - 1; i++) {
+      const a = pr(P[i].t), b = pr(P[i + 1].t);
+      items.push({ z: (a[2] + b[2]) / 2 + 0.02, k: 0, a, b, c: mix(col.fg, col.muted, 0.5), w: 1.6, al: 0.55 * (1 - aa) });
+    }
     if (showAtoms && aa > 0) {
-      const P = [];
-      D.atoms.forEach((list, i) => list.forEach((a) => P.push(pr(add(mv(poses[i].R, Rp.tmpl[D.bases[i]][a]), poses[i].t)))));
-      bonds.forEach(([a, b, i, base]) => items.push({ z: (P[a][2] + P[b][2]) / 2, k: 0, a: P[a], b: P[b], c: base || colorBy === "lddt" ? res(i) : mix(col.fg, col.muted, 0.4), w: base ? 2.2 : 1.8, al: aa }));
+      const X = [];
+      D.atoms.forEach((list, i) => list.forEach((a) => X.push(pr(add(mv(P[i].R, Rp.tmpl[D.bases[i]][a]), P[i].t)))));
+      bonds.forEach(([a, b, i, base]) => items.push({ z: (X[a][2] + X[b][2]) / 2, k: 0, a: X[a], b: X[b], c: base || colorBy === "lddt" ? res(i) : mix(col.fg, col.muted, 0.4), w: base ? 2.2 : 1.8, al: aa }));
     }
-    if (showAtoms && cg > 0) { // coarse-grained: the 3–4 frame atoms of each nucleotide
-      poses.forEach((p, i) => Rp.frameAtoms.forEach((a) => {
-        const nm = a === "N" ? glyN(D.bases[i]) : a, o = pr(add(mv(p.R, Rp.tmpl[D.bases[i]][nm]), p.t));
-        items.push({ z: o[2] - 0.03, k: 1, a: o, c: res(i), r: 3.4, al: cg * (1 - aa * 0.75) });
-      }));
-    }
+    if (showAtoms && cg > 0) P.forEach((p, i) => Rp.frameAtoms.forEach((a) => {
+      const nm = a === "N" ? glyN(D.bases[i]) : a, o = pr(add(mv(p.R, Rp.tmpl[D.bases[i]][nm]), p.t));
+      items.push({ z: o[2] - 0.03, k: 1, a: o, c: res(i), r: 4, al: cg * (1 - aa * 0.7) });
+    }));
     if (showFrames) {
-      const L = 3.6, fa = 1 - aa * 0.55;
-      poses.forEach((p) => {
+      const L = 3.6, fa = 1 - aa * 0.6;
+      P.forEach((p) => {
         const o = pr(p.t);
         [["a", 0], ["c", 1], ["t", 2]].forEach(([c, ax]) => {
           const tip = pr(add(p.t, [p.R[0][ax] * L, p.R[1][ax] * L, p.R[2][ax] * L]));
-          items.push({ z: (o[2] + tip[2]) / 2 - 0.05, k: 0, a: o, b: tip, c: col[c], w: 2.4, al: fa });
+          items.push({ z: (o[2] + tip[2]) / 2 - 0.05, k: 0, a: o, b: tip, c: col[c], w: 2.6, al: fa });
         });
       });
     }
@@ -217,27 +304,47 @@
     ctx.lineCap = "round";
     for (const it of items) {
       const c = mix(it.c, col.bg, depth(it.z));
-      if (it.k === 0) { ctx.strokeStyle = rgb(c, it.al); ctx.lineWidth = Math.max(1, it.w * it.a[3] * zoom); ctx.beginPath(); ctx.moveTo(it.a[0], it.a[1]); ctx.lineTo(it.b[0], it.b[1]); ctx.stroke(); }
-      else { ctx.fillStyle = rgb(c, it.al); ctx.beginPath(); ctx.arc(it.a[0], it.a[1], Math.max(1.6, it.r * it.a[3] * zoom), 0, 7); ctx.fill(); }
+      if (it.k === 0) { ctx.strokeStyle = rgb(c, it.al); ctx.lineWidth = Math.max(1, it.w * it.a[3] * Math.min(zoom * maxR / camR, 2.2)); ctx.beginPath(); ctx.moveTo(it.a[0], it.a[1]); ctx.lineTo(it.b[0], it.b[1]); ctx.stroke(); }
+      else { ctx.fillStyle = rgb(c, it.al); ctx.beginPath(); ctx.arc(it.a[0], it.a[1], Math.max(1.8, it.r * it.a[3] * zoom), 0, 7); ctx.fill(); }
     }
-    if (tl > t0.sm - 0.3 && tl < t0.sm + T.rec * 0.6) { // mark the black hole
-      const o = pr([0, 0, 0]), a = 1 - clamp((tl - t0.sm) / (T.rec * 0.6));
-      ctx.strokeStyle = rgb(col.fg, 0.5 * a); ctx.setLineDash([3, 4]); ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.arc(o[0], o[1], 16, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+    const u = (tl - START[3]) / REC;
+    if (s === 3 && u < 0.6) { // mark the black hole
+      const o = pr([0, 0, 0]), a = 1 - clamp(u / 0.6);
+      ctx.strokeStyle = rgb(col.fg, 0.55 * a); ctx.setLineDash([4, 4]); ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.arc(o[0], o[1], 26, 0, 7); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = rgb(col.fg, 0.8 * a); ctx.font = "600 11px 'JetBrains Mono', monospace"; ctx.fillText("black hole: R = I, t = 0", o[0] + 32, o[1] - 20);
     }
+    ctx.globalAlpha = 1;
   }
 
+  // ---------- loop ----------
   function frame(now) {
     if (!visible) { loop = false; return; }
-    if (playing) { tl = Math.min((now - playing) / 1000, T_END); if (tl >= T_END) playing = 0; syncDom(); dirty = true; }
-    if (spin && !drag) { V = mm(rot(0, 0.004), V); dirty = true; }
+    const dt = lastNow ? Math.min((now - lastNow) / 1000, 0.1) : 0; lastNow = now;
+    if (playing) {
+      tl = Math.min(tl + dt, T_END);
+      if (tl >= T_END) playing = false;
+      syncDom(); dirty = true;
+    }
+    if (spin && !drag && !playing && tl >= START[3]) { V = mm(rot(0, 0.004), V); dirty = true; } // keep the view still while the pipeline plays
     if (dirty) { draw(); dirty = false; }
     requestAnimationFrame(frame);
   }
-  const kick = () => { if (!loop && visible) { loop = true; requestAnimationFrame(frame); } };
+  const kick = () => { if (!loop && visible) { loop = true; lastNow = 0; requestAnimationFrame(frame); } };
+  function play(from) {
+    if (reduced) { tl = T_END; playing = false; syncDom(); dirty = true; kick(); return; }
+    if (from != null) tl = from; else if (tl >= T_END) tl = 0;
+    playing = true; syncDom(); kick();
+  }
+  function pause() { playing = false; syncDom(); }
+  function seek(t) { tl = Math.min(Math.max(t, 0), T_END); camR = maxR; syncDom(); dirty = true; kick(); }
   let autoplayed = false;
-  new IntersectionObserver(([en]) => { visible = en.isIntersecting; kick(); if (visible && !autoplayed && !reduced) { autoplayed = true; play(); } }, { threshold: 0.35 }).observe(cv);
-  function play() { if (reduced) { tl = T_END; syncDom(); dirty = true; kick(); return; } tl = 0; playing = performance.now(); kick(); }
+  new IntersectionObserver(([en]) => {
+    visible = en.isIntersecting;
+    if (en.intersectionRatio >= 0.55 && !autoplayed) { autoplayed = true; play(0); }
+    if (!en.isIntersecting && playing) pause(); // don't run unseen; resume with Play
+    kick();
+  }, { threshold: [0, 0.55] }).observe(cv);
 
   cv.addEventListener("pointerdown", (e) => { cv.setPointerCapture(e.pointerId); drag = true; last = [e.clientX, e.clientY]; });
   cv.addEventListener("pointermove", (e) => { if (!drag) return; V = mm(rot((e.clientY - last[1]) * 0.01, (e.clientX - last[0]) * 0.01), V); last = [e.clientX, e.clientY]; dirty = true; kick(); });
@@ -248,13 +355,20 @@
     if (key === "ArrowLeft") V = mm(rot(0, -s), V); else if (key === "ArrowRight") V = mm(rot(0, s), V);
     else if (key === "ArrowUp") V = mm(rot(-s, 0), V); else if (key === "ArrowDown") V = mm(rot(s, 0), V);
     else if (key === "+" || key === "=") zoom = Math.min(zoom * 1.15, 3); else if (key === "-") zoom = Math.max(zoom / 1.15, 0.5);
+    else if (key === " ") { playing ? pause() : play(); }
     else return;
     e.preventDefault(); dirty = true; kick();
   });
 
-  // controls
+  // ---------- controls ----------
   const press = (group, b) => group.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-  $("#flPlay").addEventListener("click", play);
+  playB.addEventListener("click", () => (playing ? pause() : play()));
+  scrub.addEventListener("input", () => { const t = (scrub.value / 1000) * T_END; playing = false; seek(t); }); // read before syncDom rewrites the slider
+  stepEls.forEach((el) => {
+    const go = () => { const k = +el.dataset.step - 1; play(START[k]); };
+    el.addEventListener("click", go);
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+  });
   const repB = $$("[data-frep]");
   repB.forEach((b) => b.addEventListener("click", () => { rep = b.dataset.frep; press(repB, b); computeFrames(); syncDom(); kick(); }));
   const colB = $$("[data-fcol]");

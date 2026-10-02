@@ -426,25 +426,27 @@
         <div class="tlab flab reveal" id="flab">
           <div class="tlab-head">
             <h4>Watch the pipeline</h4>
-            <p>On the tRNA: the language model reads the sequence, the Pairformer refines it, then the Structure Module moves every frame out of the black hole over three recycling steps. The frame atoms give the coarse-grained model, and the full-atom structure follows.</p>
+            <p>On the tRNA: the language model embeds the sequence into a pair representation, the Pairformer refines it, then the Structure Module moves every frame out of the black hole over three recycling steps while the FAPE loss falls. Click any step, or drag the timeline, to explore at your own pace.</p>
           </div>
-          <ol class="fpipe six" aria-label="Pipeline steps">
-            <li data-step="1"><span>1</span>Sequence</li>
-            <li data-step="2"><span>2</span>RNAEmbedder (language model)</li>
-            <li data-step="3"><span>3</span>Pairformer</li>
-            <li data-step="4"><span>4</span>Structure Module · R<sub>i</sub>, t<sub>i</sub>, pLDDT</li>
-            <li data-step="5"><span>5</span>Coarse-grained (frame atoms)</li>
-            <li data-step="6"><span>6</span>All-atom (Arena)</li>
+          <ol class="fpipe six" aria-label="Pipeline steps: click one to jump to it">
+            <li data-step="1" role="button" tabindex="0"><span>1</span>Sequence</li>
+            <li data-step="2" role="button" tabindex="0"><span>2</span>RNAEmbedder (language model)</li>
+            <li data-step="3" role="button" tabindex="0"><span>3</span>Pairformer</li>
+            <li data-step="4" role="button" tabindex="0"><span>4</span>Structure Module · R<sub>i</sub>, t<sub>i</sub>, pLDDT</li>
+            <li data-step="5" role="button" tabindex="0"><span>5</span>Coarse-grained (frame atoms)</li>
+            <li data-step="6" role="button" tabindex="0"><span>6</span>All-atom (Arena)</li>
           </ol>
-          <div class="ftokens" id="flTokens" aria-hidden="true"></div>
           <div class="tlab-grid">
+            <div class="fl-left">
             <div class="tlab-stage">
               <canvas id="flCanvas" tabindex="0" aria-label="Frame-based reconstruction of a tRNA. Drag or use the arrow keys to rotate."></canvas>
               <div class="tlab-legend" aria-hidden="true"><span><i class="ln" style="background:var(--a)"></i>x</span><span><i class="ln" style="background:var(--c)"></i>y</span><span><i class="ln" style="background:var(--t)"></i>z frame axes</span><span class="lddt-key"><i class="ln lddt"></i>lDDT 0 → 1</span></div>
               <p class="fl-status" id="flRecycle" aria-live="polite"></p>
             </div>
+            <input class="fl-scrub" type="range" id="flScrub" min="0" max="1000" value="1000" aria-label="Pipeline timeline">
+            </div>
             <div class="tlab-panel">
-              <div class="ctl row"><button class="btn solid sm" type="button" id="flPlay">▶ Play the pipeline</button><button class="chip-btn" type="button" id="flSpin" aria-pressed="true">Pause spin</button></div>
+              <div class="ctl row"><button class="btn solid sm" type="button" id="flPlay" aria-pressed="false">▶ Play</button><button class="chip-btn" type="button" id="flSpin" aria-pressed="true">Pause spin</button></div>
               <div class="ctl">
                 <span class="ctl-k">Frame representation</span>
                 <div class="seg wrap">

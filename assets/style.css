@@ -516,6 +516,15 @@ button.tok.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .ln.lddt{width:36px;background:linear-gradient(90deg,color-mix(in srgb,var(--line) 70%,var(--muted)),var(--t))}
 .frame-eq.sm{font-size:.78rem;text-align:left;padding:8px 10px;margin:0}
 .readouts.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+.flab .tlab-legend{opacity:0;transition:opacity .4s}
+.flab.in3d .tlab-legend{opacity:1}
+.fpipe li[role=button]{cursor:pointer}
+.fpipe li[role=button]:hover{border-color:var(--fg)}
+.fl-left{display:grid;gap:8px;align-content:start}
+.fl-scrub{width:100%;accent-color:var(--a);margin:0}
+.flab .tlab-stage{min-height:460px}
+.flab .tlab-stage canvas{min-height:460px}
+.fl-status{background:color-mix(in srgb,var(--bg) 85%,transparent);padding:4px 6px;border-radius:6px}
 /* modality chart */
 .modchart{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:clamp(16px,2.6vw,24px);display:grid;gap:12px}
 .mc-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:flex-end}
