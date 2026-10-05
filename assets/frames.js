@@ -4,6 +4,7 @@
 (function () {
   const D = window.FRAME_DATA, root = document.getElementById("flab");
   if (!D || !root) return;
+  const T = (s) => (window.I18N ? window.I18N.t(s) : s);
   const $ = (s) => root.querySelector(s), $$ = (s) => Array.from(root.querySelectorAll(s));
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const cv = $("#flCanvas"), ctx = cv.getContext("2d");
@@ -129,7 +130,7 @@
     lddtRes = lddt(full);
     metrics = { rmsd: sp.rmsd, tm: tm / n, inf: Math.sqrt(ppv * sty), lddt: lddtRes.reduce((a, b) => a + b, 0) / n };
     buildBonds(R.tmpl);
-    $("#flAtoms").textContent = R.frameAtoms.map((a) => (a === "N" ? "N1/N9" : a.replace("'", "′"))).join(" · ") + (R.frameAtoms.length === 4 ? "  (4 atoms, least-squares fit)" : "  (3 atoms, Gram-Schmidt)");
+    $("#flAtoms").textContent = R.frameAtoms.map((a) => (a === "N" ? "N1/N9" : a.replace("'", "′"))).join(" · ") + (R.frameAtoms.length === 4 ? "  " + T("(4 atoms, least-squares fit)") : "  " + T("(3 atoms, Gram-Schmidt)"));
     dirty = true;
   }
 
@@ -203,14 +204,14 @@
     const s = stepAt(tl), done = tl >= T_END;
     stepEls.forEach((el) => { const k = +el.dataset.step - 1; el.classList.toggle("on", k === s && !done); el.classList.toggle("done", k < s || done); el.setAttribute("aria-current", k === s && !done ? "step" : "false"); });
     root.classList.toggle("in3d", s >= 3);
-    if (s === 3) { curFape = fape(poses()); const u = (tl - START[3]) / REC; statusEl.textContent = u < 0.08 ? "4 · Structure Module: black-hole initialisation, every frame at the origin (R = I, t = 0)" : `4 · Structure Module · recycle ${Math.min(3, Math.floor(u) + 1)} / 3 · FAPE ${curFape.toFixed(2)}`; }
-    else statusEl.textContent = done ? "Done. Drag to rotate, or change the representation, colours and errors" : STATUS[s];
+    if (s === 3) { curFape = fape(poses()); const u = (tl - START[3]) / REC; statusEl.textContent = u < 0.08 ? T("4 · Structure Module: black-hole initialisation, every frame at the origin (R = I, t = 0)") : `4 · ${T("Structure Module · recycle")} ${Math.min(3, Math.floor(u) + 1)} / 3 · FAPE ${curFape.toFixed(2)}`; }
+    else statusEl.textContent = done ? T("Done. Drag to rotate, or change the representation, colours and errors") : T(STATUS[s]);
     const pending = playing && tl < START[6], q = playing ? ease(local(6)) : 1;
     const show = (id, v, unit = "") => ($(id).textContent = pending ? "…" : (v * q).toFixed(2) + unit);
     show("#flRmsd", metrics.rmsd, " Å"); show("#flInf", metrics.inf); show("#flTm", metrics.tm); show("#flLddt", metrics.lddt);
     root.style.setProperty("--qa", pending ? "0" : "1");
     scrub.value = Math.round((tl / T_END) * 1000);
-    playB.textContent = playing ? "❚❚ Pause" : done ? "↻ Replay" : "▶ Play";
+    playB.textContent = playing ? T("❚❚ Pause") : done ? T("↻ Replay") : T("▶ Play");
     playB.setAttribute("aria-pressed", String(playing));
   }
 
@@ -252,7 +253,7 @@
       }
       ctx.globalAlpha = alpha * appear;
       ctx.font = "600 10px 'JetBrains Mono', monospace"; ctx.fillStyle = rgb(col.muted); ctx.textAlign = "left";
-      ctx.fillText(s >= 2 ? "pair representation → C4′ distance map" : "pair representation (L × L)", xM, yM + size + 14);
+      ctx.fillText(s >= 2 ? T("pair representation → C4′ distance map") : T("pair representation (L × L)"), xM, yM + size + 14);
     }
     ctx.globalAlpha = 1; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
   }
@@ -310,7 +311,7 @@
       const o = pr([0, 0, 0]), a = 1 - clamp(u / 0.6);
       ctx.strokeStyle = rgb(col.fg, 0.55 * a); ctx.setLineDash([4, 4]); ctx.lineWidth = 1.3;
       ctx.beginPath(); ctx.arc(o[0], o[1], 26, 0, 7); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = rgb(col.fg, 0.8 * a); ctx.font = "600 11px 'JetBrains Mono', monospace"; ctx.fillText("black hole: R = I, t = 0", o[0] + 32, o[1] - 20);
+      ctx.fillStyle = rgb(col.fg, 0.8 * a); ctx.font = "600 11px 'JetBrains Mono', monospace"; ctx.fillText(T("black hole: R = I, t = 0"), o[0] + 32, o[1] - 20);
     }
     ctx.globalAlpha = 1;
   }
@@ -384,11 +385,12 @@
   $("#flRot").addEventListener("input", (e) => { sigR = +e.target.value; $("#flRotV").textContent = sigR + "°"; toResult(); computeFrames(); syncDom(); kick(); });
   $("#flTr").addEventListener("input", (e) => { sigT = +e.target.value / 10; $("#flTrV").textContent = sigT.toFixed(1) + " Å"; toResult(); computeFrames(); syncDom(); kick(); });
   $("#flReseed").addEventListener("click", () => { reseed(); toResult(); computeFrames(); syncDom(); kick(); });
-  $("#flSpin").addEventListener("click", (e) => { spin = !spin; e.target.setAttribute("aria-pressed", String(spin)); e.target.textContent = spin ? "Pause spin" : "Spin"; kick(); });
+  $("#flSpin").addEventListener("click", (e) => { spin = !spin; e.target.setAttribute("aria-pressed", String(spin)); e.target.textContent = spin ? T("Pause spin") : T("Spin"); kick(); });
 
   new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColors);
   reseed(); readColors(); computeFrames(); syncDom();
+  document.addEventListener("langchange", () => { computeFrames(); syncDom(); const b = $("#flSpin"); b.textContent = spin ? T("Pause spin") : T("Spin"); dirty = true; kick(); });
 })();
 
 // Modality comparison (thesis Table 6.2): reconstruction from the TRUE values of each modality, then Arena to all-atom,
@@ -396,6 +398,7 @@
 (function () {
   const box = document.getElementById("modChart");
   if (!box) return;
+  const T = (s) => (window.I18N ? window.I18N.t(s) : s);
   const MODS = ["Frames (NuFold)", "Torsion angles", "Torsion angles, constant bond angles", "Distances, discretised", "Distances"];
   const M = {
     rmsd: { label: "RMSD", unit: " Å", better: "lower", v: [[0.82, 0.17], [2.86, 4.53], [9.52, 7.15], [10.71, 8.2], [10.39, 8.86]] },
@@ -420,19 +423,19 @@
       const y = top + i * rowH, bh = 14, cy = narrow ? y + 30 : y + rowH / 2, x0 = x(0), x1 = x(a), lo = x(Math.max(0, a - s)), hi = x(a + s);
       const cls = i === 0 ? "mc-bar hl" : "mc-bar";
       g += `<g class="mc-row" data-i="${i}"><rect class="mc-hit" x="0" y="${y}" width="${w}" height="${rowH}"/>`
-        + (narrow ? `<text x="${padL}" y="${y + 14}" class="mc-lbl${i === 0 ? " hl" : ""}">${MODS[i]}</text>` : `<text x="${padL - 10}" y="${cy + 4}" text-anchor="end" class="mc-lbl${i === 0 ? " hl" : ""}">${MODS[i]}</text>`)
+        + (narrow ? `<text x="${padL}" y="${y + 14}" class="mc-lbl${i === 0 ? " hl" : ""}">${T(MODS[i])}</text>` : `<text x="${padL - 10}" y="${cy + 4}" text-anchor="end" class="mc-lbl${i === 0 ? " hl" : ""}">${T(MODS[i])}</text>`)
         + `<path class="${cls}" d="M${x0} ${cy - bh / 2} H${Math.max(x0, x1 - 4)} q4 0 4 4 V${cy + bh / 2 - 4} q0 4 -4 4 H${x0} Z"/>`
         + `<line class="mc-err" x1="${lo}" x2="${hi}" y1="${cy}" y2="${cy}"/><line class="mc-err" x1="${hi}" x2="${hi}" y1="${cy - 4}" y2="${cy + 4}"/>`
         + `<text x="${Math.max(x1, hi) + 8}" y="${cy + 4}" class="mc-val">${fmt(a)}${m.unit}${i === best ? " ★" : ""}</text></g>`;
     });
     svg.innerHTML = g;
-    note.textContent = `${m.better === "lower" ? "Lower" : "Higher"} is better. ★ marks the best modality for ${m.label}.`;
-    table.innerHTML = `<thead><tr><th>Modality</th>${Object.values(M).map((x) => `<th>${x.label}${x.better === "lower" ? " ↓" : " ↑"}</th>`).join("")}</tr></thead><tbody>`
-      + MODS.map((name, i) => `<tr><th>${name}</th>${Object.values(M).map((x) => `<td>${fmt(x.v[i][0])} ± ${fmt(x.v[i][1])}</td>`).join("")}</tr>`).join("") + "</tbody>";
+    note.textContent = (m.better === "lower" ? T("Lower is better.") : T("Higher is better.")) + " " + T("★ marks the best modality for {m}.").replace("{m}", T(m.label));
+    table.innerHTML = `<thead><tr><th>${T("Modality")}</th>${Object.values(M).map((x) => `<th>${T(x.label)}${x.better === "lower" ? " ↓" : " ↑"}</th>`).join("")}</tr></thead><tbody>`
+      + MODS.map((name, i) => `<tr><th>${T(name)}</th>${Object.values(M).map((x) => `<td>${fmt(x.v[i][0])} ± ${fmt(x.v[i][1])}</td>`).join("")}</tr>`).join("") + "</tbody>";
     svg.querySelectorAll(".mc-row").forEach((row) => {
       row.addEventListener("pointerenter", () => {
         const i = +row.dataset.i, [a, s] = m.v[i];
-        tip.innerHTML = `<b>${MODS[i]}</b><br>${m.label}: ${fmt(a)}${m.unit} ± ${fmt(s)}${m.unit}`;
+        tip.innerHTML = `<b>${T(MODS[i])}</b><br>${T(m.label)}: ${fmt(a)}${m.unit} ± ${fmt(s)}${m.unit}`;
         const r = row.getBoundingClientRect(), b = svg.parentElement.getBoundingClientRect();
         tip.style.left = Math.max(0, Math.min(r.left - b.left + padL, b.width - 220)) + "px"; tip.style.top = r.top - b.top - 44 + "px"; tip.hidden = false;
         row.classList.add("hover");
@@ -443,7 +446,8 @@
   const btns = box.querySelectorAll("[data-mc]");
   btns.forEach((b) => b.addEventListener("click", () => { key = b.dataset.mc; btns.forEach((x) => x.setAttribute("aria-pressed", String(x === b))); render(); }));
   const tb = box.querySelector("#mcTable");
-  tb.addEventListener("click", () => { const on = table.hidden; table.hidden = !on; tb.setAttribute("aria-pressed", String(on)); tb.textContent = on ? "Hide table" : "Show table"; });
+  tb.addEventListener("click", () => { const on = table.hidden; table.hidden = !on; tb.setAttribute("aria-pressed", String(on)); tb.textContent = on ? T("Hide table") : T("Show table"); });
+  document.addEventListener("langchange", () => { tb.textContent = table.hidden ? T("Show table") : T("Hide table"); render(); });
   new ResizeObserver(render).observe(svg);
   render();
 })();

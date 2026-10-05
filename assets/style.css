@@ -34,12 +34,12 @@ a{color:inherit}
 /* nav */
 nav.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 nav.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px}
-.logo{font-family:var(--display);font-weight:800;font-size:1.25rem;text-decoration:none;letter-spacing:-.02em}
+.logo{font-family:var(--display);font-weight:800;font-size:1.25rem;text-decoration:none;letter-spacing:-.02em;white-space:nowrap}
 .logo span{color:var(--a);display:inline-block;transition:transform .3s ease}
 .logo:hover span{transform:translateY(-4px) scale(1.3)}
 .nav-right{display:flex;align-items:center;gap:clamp(10px,2vw,22px)}
 nav.top ul{display:flex;gap:clamp(12px,2.2vw,26px);list-style:none;margin:0;padding:0;font-size:.9rem;font-weight:500}
-nav.top ul a{text-decoration:none;color:var(--muted);position:relative;padding-block:4px;transition:color .2s}
+nav.top ul a{text-decoration:none;color:var(--muted);position:relative;padding-block:4px;transition:color .2s;white-space:nowrap}
 nav.top ul a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;border-radius:2px;background:var(--a);transform:scaleX(0);transition:transform .25s ease}
 nav.top ul a:hover,nav.top ul a.active{color:var(--fg)}
 nav.top ul a.active::after{transform:scaleX(1)}
@@ -53,7 +53,8 @@ nav.top ul a.active::after{transform:scaleX(1)}
   :root:not([data-theme="light"]) .theme-btn .sun{display:block}
   :root:not([data-theme="light"]) .theme-btn .moon{display:none}}
 .menu-btn{display:none}
-@media (max-width:1040px){
+.lang-btn{font-family:var(--mono);font-size:.78rem;font-weight:600;letter-spacing:.04em}
+@media (max-width:1180px){
   .menu-btn{display:grid}
   nav.top ul{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:var(--bg);border-bottom:1px solid var(--line);padding:8px clamp(16px,4vw,40px) 16px;
     clip-path:inset(0 0 100% 0);visibility:hidden;transition:clip-path .3s ease,visibility .3s}
@@ -609,6 +610,30 @@ button.tok.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .glance b{display:block;font-family:var(--display);font-size:2rem;line-height:1;letter-spacing:-.03em}
 .glance span{font-size:.85rem;color:var(--muted)}
 .glance div:nth-child(1) b{color:var(--a)} .glance div:nth-child(2) b{color:var(--t)} .glance div:nth-child(3) b{color:var(--c)} .glance div:nth-child(4) b{color:color-mix(in srgb,var(--g) 75%,var(--fg))}
+
+
+/* AlphaFold 3 explorer (shares the State-of-the-RNArt chrome) */
+.af3-chart .sc-legend button[data-aset]{font:inherit;font-size:.84rem;padding:5px 11px;border-radius:999px;border:1.5px solid var(--line);background:none;color:var(--fg);cursor:pointer}
+.af3-chart .sc-legend button[data-aset][aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.af3-chart .sc-legend #acTable{margin-left:auto}
+.ac-plot{position:relative}
+.ac-plot svg{width:100%;display:block;overflow:visible}
+.ac-axis line{stroke:var(--line);stroke-width:1}
+.ac-axis text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+.ac-axis .ac-lab{font-family:var(--body);font-size:11.5px;fill:var(--muted)}
+.ac-row{transition:opacity .25s}
+.ac-row.dim{opacity:.22}
+.ac-hit{fill:transparent}
+.ac-row:hover .ac-hit{fill:color-mix(in srgb,var(--fg) 4%,transparent)}
+.ac-name{font-size:12.5px;fill:var(--fg);font-weight:500;font-family:var(--body)}
+.ac-name tspan{fill:var(--muted);font-family:var(--mono);font-size:10.5px;font-weight:400}
+.ac-dot{fill:var(--dl);opacity:.38}
+.ac-row.on .ac-dot{opacity:.6}
+.ac-dot:hover,.ac-pt:hover{opacity:1!important;stroke:var(--surface);stroke-width:1.5}
+.ac-med{stroke:var(--fg);stroke-width:3;stroke-linecap:round}
+.ac-val{font-family:var(--mono);font-size:11.5px;fill:var(--fg)}
+.ac-pt{fill:color-mix(in srgb,var(--muted) 55%,var(--surface));opacity:.45;transition:opacity .25s}
+.ac-pt.on{fill:var(--dl);opacity:.6}
 
 /* back to top + toast */
 .to-top{position:fixed;right:clamp(16px,3vw,28px);bottom:clamp(16px,3vw,28px);z-index:15;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .25s,transform .25s}

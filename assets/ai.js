@@ -4,6 +4,7 @@
   if (!root) return;
   const $ = (s) => root.querySelector(s), $$ = (s) => Array.from(root.querySelectorAll(s));
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const T = (s) => (window.I18N ? window.I18N.t(s) : s);
 
   // shared colour helpers
   let col = {};
@@ -127,7 +128,7 @@
       const c = cells[i * n + j]; c.style.setProperty("--w", A[i][j].toFixed(3)); c.classList.toggle("row", i === sel);
     }
     const top = w.map((v, j) => [v, j]).filter(([, j]) => j !== sel).sort((a, b) => b[0] - a[0])[0];
-    headInfo.innerHTML = `<b>${HEADS[head].name}.</b> ${HEADS[head].info} “${tokens[sel]}” attends most to “${tokens[top ? top[1] : sel]}” (${Math.round((top ? top[0] : w[sel]) * 100)}%).`;
+    headInfo.innerHTML = `<b>${T(HEADS[head].name)}.</b> ${T(HEADS[head].info)} ` + T("“{a}” attends most to “{b}” ({p}%).").replace("{a}", tokens[sel]).replace("{b}", tokens[top ? top[1] : sel]).replace("{p}", Math.round((top ? top[0] : w[sel]) * 100));
   }
   $$("[data-head]").forEach((b) => b.addEventListener("click", () => {
     head = +b.dataset.head;
@@ -178,7 +179,7 @@
     if (done) {
       ep++; history.push(epSteps); if (history.length > 120) history.shift();
       successes.push(atGoal ? 1 : 0); if (successes.length > 20) successes.shift();
-      if (greedy) { greedy = false; setRunning(false); $("#rlMsg").textContent = atGoal ? `Greedy run reached the goal in ${epSteps} steps.` : lava ? "Greedy run fell in the lava. Train a bit more." : "Greedy run got lost. Train a bit more."; }
+      if (greedy) { greedy = false; setRunning(false); $("#rlMsg").textContent = atGoal ? T("Greedy run reached the goal in {n} steps.").replace("{n}", epSteps) : lava ? T("Greedy run fell in the lava. Train a bit more.") : T("Greedy run got lost. Train a bit more."); }
       eps = Math.max(0.05, eps * 0.97);
       newEpisode();
     }
@@ -214,7 +215,7 @@
       if (t === 2) { ctx.fillStyle = rgb(col.bg, 0.25); ctx.font = `${cell * 0.38}px system-ui`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("≈", px + cell / 2, py + cell / 2); }
       if (t === 0 && (Q[s * 4] || Q[s * 4 + 1] || Q[s * 4 + 2] || Q[s * 4 + 3]) && !(x === goal[0] && y === goal[1])) arrow(px + cell / 2, py + cell / 2, argmax(s), cell * 0.17);
     }
-    label(goal, "GOAL", col.g); label(start, "START", null);
+    label(goal, T("GOAL"), col.g); label(start, T("START"), null);
     trail.forEach((p, i) => { ctx.fillStyle = rgb(col.t, (i / trail.length) * 0.35); ctx.beginPath(); ctx.arc((p[0] + 0.5) * cell, (p[1] + 0.5) * cell, cell * 0.12, 0, 7); ctx.fill(); });
     ctx.fillStyle = rgb(col.t); ctx.strokeStyle = rgb(col.bg); ctx.lineWidth = 3;
     ctx.beginPath(); ctx.arc((agent[0] + 0.5) * cell, (agent[1] + 0.5) * cell, cell * 0.28, 0, 7); ctx.fill(); ctx.stroke();
@@ -259,10 +260,10 @@
   function rlKick() { if (!rlLoop && rlVisible) { rlLoop = true; requestAnimationFrame(rlFrame); } }
   new IntersectionObserver(([en]) => { rlVisible = en.isIntersecting; rlKick(); }).observe(cv);
 
-  function setRunning(v) { running = v; const b = $("#rlRun"); b.textContent = v ? "Pause" : "Train"; b.setAttribute("aria-pressed", String(v)); rlKick(); }
+  function setRunning(v) { running = v; const b = $("#rlRun"); b.textContent = v ? T("Pause") : T("Train"); b.setAttribute("aria-pressed", String(v)); rlKick(); }
   $("#rlRun").addEventListener("click", () => { greedy = false; $("#rlMsg").textContent = ""; setRunning(!running); });
-  $("#rlGreedy").addEventListener("click", () => { newEpisode(); greedy = true; $("#rlMsg").textContent = "Following the learned policy, no exploration…"; setRunning(true); });
-  $("#rlReset").addEventListener("click", () => { setRunning(false); resetAgent(); $("#rlMsg").textContent = "Agent memory wiped. It knows nothing again."; });
+  $("#rlGreedy").addEventListener("click", () => { newEpisode(); greedy = true; $("#rlMsg").textContent = T("Following the learned policy, no exploration…"); setRunning(true); });
+  $("#rlReset").addEventListener("click", () => { setRunning(false); resetAgent(); $("#rlMsg").textContent = T("Agent memory wiped. It knows nothing again."); });
   $("#rlMap").addEventListener("click", () => { setRunning(false); defaultMap(); resetAgent(); $("#rlMsg").textContent = ""; });
   $$("[data-speed]").forEach((b) => b.addEventListener("click", () => { speed = +b.dataset.speed; $$("[data-speed]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); }));
   $$("[data-tool]").forEach((b) => b.addEventListener("click", () => { tool = b.dataset.tool; $$("[data-tool]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); }));
@@ -293,5 +294,6 @@
 
   readColors();
   defaultMap(); resetAgent();
+  document.addEventListener("langchange", () => { renderAttn(); setRunning(running); $("#rlMsg").textContent = ""; rlDirty = true; rlKick(); });
   buildAttn();
 })();

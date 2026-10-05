@@ -6,6 +6,7 @@
   const cv = $("canvas"), ctx = cv.getContext("2d"), tip = $(".rna-tip");
   const seqEl = $("#rnaSeq"), rmsdEl = $("#rnaRmsd"), pairsEl = $("#rnaPairs"), slider = $("#rnaFold"), foldBtn = $("#rnaFoldBtn");
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const T = (s) => (window.I18N ? window.I18N.t(s) : s);
 
   // colours from the site tokens (refreshed when the theme changes)
   let col = {};
@@ -64,7 +65,7 @@
     S.pairs.forEach(([i, j]) => { if (dist(B[i], B[j]) < dist(natB[i], natB[j]) + 1.5) formed++; });
     pairsEl.textContent = `${formed} / ${S.pairs.length}`;
     slider.value = Math.round(t * 100);
-    foldBtn.textContent = t > 0.5 ? "Unfold" : "Fold it";
+    foldBtn.textContent = t > 0.5 ? T("Unfold") : T("Fold it");
     dirty = true;
   }
   const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
@@ -190,7 +191,7 @@
     $$("#rnaSeq .nt").forEach((el, k) => el.classList.toggle("hi", i >= 0 && (k === i || k === pairOf[i])));
     if (i < 0) return hideTip();
     const j = pairOf[i];
-    tip.innerHTML = `<b>${label(i)}</b> ${j >= 0 ? `paired with <b>${label(j)}</b>` : "unpaired"}`;
+    tip.innerHTML = `<b>${label(i)}</b> ${j >= 0 ? `${T("paired with")} <b>${label(j)}</b>` : T("unpaired")}`;
     if (x == null) { const p = projB[i] || [W / 2, H / 2]; x = p[0]; y = p[1]; }
     tip.style.transform = `translate(${Math.min(x + 14, W - 170)}px, ${Math.max(y - 36, 4)}px)`;
     tip.hidden = false;
@@ -216,12 +217,12 @@
       s.addEventListener("click", () => setHover(i));
       seqEl.appendChild(s);
     }
-    $("#rnaName").textContent = `${S.name} · PDB ${S.id} · ${n} nt`;
+    $("#rnaName").textContent = `${T(S.name)} · PDB ${S.id} · ${n} nt`;
     $("#rnaLink").href = `https://www.rcsb.org/structure/${S.id}`;
   }
 
   // controls
-  function setSpin(v) { spin = v; const b = $("#rnaSpin"); b.setAttribute("aria-pressed", String(v)); b.textContent = v ? "Pause spin" : "Spin"; kick(); }
+  function setSpin(v) { spin = v; const b = $("#rnaSpin"); b.setAttribute("aria-pressed", String(v)); b.textContent = v ? T("Pause spin") : T("Spin"); kick(); }
   function toggleFold() {
     const to = t > 0.5 ? 0 : 1;
     if (reduced) { t = to; update(); kick(); return; }
@@ -245,6 +246,7 @@
   new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColors);
   readColors(); load(0); setSpin(spin);
+  document.addEventListener("langchange", () => { $("#rnaName").textContent = `${T(S.name)} · PDB ${S.id} · ${n} nt`; update(); setSpin(spin); });
 
   // start unfolded and fold the first time the viewer scrolls into view
   if (!reduced) {

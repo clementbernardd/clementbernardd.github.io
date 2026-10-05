@@ -4,6 +4,7 @@
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = matchMedia("(pointer: fine)").matches;
   const root = document.documentElement;
+  const T = (s) => (window.I18N ? window.I18N.t(s) : s);
 
   // toast
   const toastEl = $("#toast");
@@ -30,7 +31,7 @@
   const setMenu = (open) => {
     nav.classList.toggle("open", open);
     menuBtn.setAttribute("aria-expanded", String(open));
-    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    menuBtn.setAttribute("aria-label", open ? T("Close menu") : T("Open menu"));
   };
   menuBtn.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
   $$("#menu a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
@@ -98,10 +99,10 @@
     (async function loop() {
       for (;;) {
         await sleep(2400);
-        const w = words[wi];
+        const w = rot.textContent; // erase whatever is shown (it may already be translated)
         for (let i = w.length; i >= 0; i--) { rot.textContent = w.slice(0, i); await sleep(45); }
         wi = (wi + 1) % words.length;
-        const n = words[wi];
+        const n = T(words[wi]);
         for (let i = 1; i <= n.length; i++) { rot.textContent = n.slice(0, i); await sleep(80); }
       }
     })();
@@ -137,7 +138,7 @@
   let flipped = false;
   function flipStrand() {
     flipped = !flipped;
-    label.textContent = flipped ? "3′ → 5′ (complement)" : "5′ → 3′";
+    label.textContent = flipped ? T("3′ → 5′ (complement)") : "5′ → 3′";
     $$(".strand-track", strand).forEach((track) => {
       Array.from(track.children).forEach((el, i) => {
         const swap = () => {
@@ -182,7 +183,7 @@
   sk.addEventListener("click", () => {
     const on = grid.classList.toggle("weekly");
     sk.setAttribute("aria-pressed", String(on));
-    sk.textContent = on ? "Show all skills" : "Highlight weekly skills";
+    sk.textContent = on ? T("Show all skills") : T("Highlight core skills");
   });
 
   // project cards: 3D tilt + glare
@@ -236,11 +237,11 @@
   // copy email
   const btn = $("#copyBtn"), em = $("#email");
   btn.addEventListener("click", () => {
-    const done = () => { btn.textContent = "Copied ✓"; toast("Email copied to clipboard"); setTimeout(() => (btn.textContent = "Copy email"), 1800); };
+    const done = () => { btn.textContent = T("Copied ✓"); toast(T("Email copied to clipboard")); setTimeout(() => (btn.textContent = T("Copy email")), 1800); };
     const fallback = () => {
       const r = document.createRange(); r.selectNodeContents(em);
       const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
-      toast("Selected, press Ctrl+C / ⌘C");
+      toast(T("Selected, press Ctrl+C / ⌘C"));
     };
     try { navigator.clipboard.writeText(em.textContent).then(done, fallback); } catch (e) { fallback(); }
   });
@@ -251,10 +252,11 @@
     try {
       const s = new Date().toLocaleTimeString("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit" });
       tEls[0].textContent = "Paris · " + s;
-      tEls[1].textContent = s + " in Paris";
+      tEls[1].textContent = T("{t} in Paris").replace("{t}", s);
     } catch (e) {}
   };
   tick(); setInterval(tick, 30000);
+  document.addEventListener("langchange", () => { tick(); rot.textContent = T(words[0]); });
   $("#year").textContent = new Date().getFullYear();
 
   console.log("%c ATGC %c Thanks for looking under the hood.", "background:#13152B;color:#FFB800;font-weight:bold;padding:2px 6px;border-radius:4px", "color:inherit");

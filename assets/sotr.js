@@ -4,6 +4,7 @@
   const D = window.SOTR_DATA, root = document.getElementById("sotrChart");
   if (!D || !root) return;
   const $ = (s) => root.querySelector(s), $$ = (s) => Array.from(root.querySelectorAll(s));
+  const T = (s) => (window.I18N ? window.I18N.t(s) : s);
   const svg = $(".sc-plot svg"), tip = $(".sc-tip"), table = $("table"), note = $(".sc-note");
 
   const DS = { RNA_PUZZLES: "RNA-Puzzles", CASP_RNA: "CASP-RNA", RNASOLO: "RNASolo" };
@@ -92,15 +93,15 @@
     svg.innerHTML = g;
     lastOrder = {}; R.forEach((r, i) => (lastOrder[r.name] = i));
     requestAnimationFrame(() => requestAnimationFrame(() => svg.querySelectorAll(".sc-row").forEach((el) => el.classList.add("settle")))); // two frames so rows animate from their old rank
-    note.innerHTML = `<b>${m.label}</b>: ${m.desc} ${m.better === "lower" ? "Lower" : "Higher"} is better. ★ best on ${DS[ds]}.` + (metric !== "overall" ? " Each faint dot is one target; the marker is the mean." : "");
+    note.innerHTML = `<b>${T(m.label)}</b>: ${T(m.desc)} ${m.better === "lower" ? T("Lower is better.") : T("Higher is better.")} ` + T("★ best on {d}.").replace("{d}", DS[ds]) + (metric !== "overall" ? " " + T("Each faint dot is one target; the marker is the mean.") : "");
     renderTable(R);
     bind(R);
   }
 
   function renderTable(R) {
     const cols = ["overall", ...METRICS];
-    table.innerHTML = `<thead><tr><th>Method</th><th>Family</th><th>Targets</th>${cols.map((c) => `<th>${MET[c].label}${MET[c].better === "lower" ? " ↓" : " ↑"}</th>`).join("")}</tr></thead><tbody>`
-      + R.map((r) => `<tr><th>${r.name}</th><td>${FAM[r.fam]}</td><td>${r.n} / ${r.total}</td>${cols.map((c) => `<td>${r.means[c] == null ? "–" : fmt(r.means[c], c)}</td>`).join("")}</tr>`).join("") + "</tbody>";
+    table.innerHTML = `<thead><tr><th>${T("Method")}</th><th>${T("Family")}</th><th>${T("Targets")}</th>${cols.map((c) => `<th>${T(MET[c].label)}${MET[c].better === "lower" ? " ↓" : " ↑"}</th>`).join("")}</tr></thead><tbody>`
+      + R.map((r) => `<tr><th>${r.name}</th><td>${T(FAM[r.fam])}</td><td>${r.n} / ${r.total}</td>${cols.map((c) => `<td>${r.means[c] == null ? "–" : fmt(r.means[c], c)}</td>`).join("")}</tr>`).join("") + "</tbody>";
   }
 
   function showTip(html, ev) {
@@ -116,8 +117,8 @@
       const r = byName[row.dataset.name];
       row.addEventListener("pointermove", (e) => {
         const dot = e.target.closest(".sc-dot");
-        if (dot) showTip(`<b>${r.name}</b> · ${dot.dataset.rna}<br>${MET[metric].label}: ${fmt(+dot.dataset.v, metric)}${MET[metric].unit}`, e);
-        else showTip(`<b>${r.name}</b> · ${FAM[r.fam]}<br>${metric === "overall" ? "Overall score" : "Mean " + MET[metric].label}: ${fmt(r.means[metric], metric)}${MET[metric].unit}<br><span>${r.n} of ${r.total} targets predicted</span>`, e);
+        if (dot) showTip(`<b>${r.name}</b> · ${dot.dataset.rna}<br>${T(MET[metric].label)}: ${fmt(+dot.dataset.v, metric)}${MET[metric].unit}`, e);
+        else showTip(`<b>${r.name}</b> · ${T(FAM[r.fam])}<br>${metric === "overall" ? T("Overall score") : T("Mean {m}").replace("{m}", T(MET[metric].label))}: ${fmt(r.means[metric], metric)}${MET[metric].unit}<br><span>${T("{n} of {t} targets predicted").replace("{n}", r.n).replace("{t}", r.total)}</span>`, e);
         row.classList.add("hover");
       });
       row.addEventListener("pointerleave", () => { tip.hidden = true; row.classList.remove("hover"); });
@@ -135,7 +136,8 @@
     svg.querySelectorAll(".sc-row").forEach((el) => el.classList.toggle("dim", !!focus && !el.classList.contains("f-" + focus)));
   }));
   const tb = $("#scTable");
-  tb.addEventListener("click", () => { const on = table.hidden; table.hidden = !on; tb.setAttribute("aria-pressed", String(on)); tb.textContent = on ? "Hide table" : "Show table"; });
+  tb.addEventListener("click", () => { const on = table.hidden; table.hidden = !on; tb.setAttribute("aria-pressed", String(on)); tb.textContent = on ? T("Hide table") : T("Show table"); });
+  document.addEventListener("langchange", () => { tb.textContent = table.hidden ? T("Show table") : T("Hide table"); render(); });
   // dataset sizes in the buttons
   dsB.forEach((b) => (b.querySelector("i").textContent = D.datasets[b.dataset.sds].rnas.length));
   new ResizeObserver(() => render()).observe(svg);

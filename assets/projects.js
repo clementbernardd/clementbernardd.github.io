@@ -4,6 +4,7 @@
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const canHover = matchMedia("(hover: hover)").matches;
+  const tr = (s) => (window.I18N ? window.I18N.t(s) : s); // "T" is used for a colour below
   const press = (group, btn) => group.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
   const hex = (h) => { h = h.trim().replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); const n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   const cssVar = (k) => hex(getComputedStyle(document.documentElement).getPropertyValue("--" + k) || "#888");
@@ -30,14 +31,15 @@
 
   /* ---------- tutorials: series picker ---------- */
   const series = $$(".serie"), posts = $$("#posts li"), allBtn = $("#postsAll"), label = $("#postsLabel");
-  posts.forEach((li, i) => (li.querySelector("a").dataset.n = String(i + 1).padStart(2, "0")));
+  const numberPosts = () => posts.forEach((li, i) => (li.querySelector("a").dataset.n = String(i + 1).padStart(2, "0")));
+  numberPosts();
   let cur = "basics", showAll = false;
   function renderPosts() {
     posts.forEach((li) => (li.hidden = !showAll && li.dataset.series !== cur));
     const b = series.find((x) => x.dataset.series === cur);
-    label.textContent = showAll ? "All 11 articles" : b.querySelector("b").textContent;
+    label.textContent = showAll ? tr("All 11 articles") : b.querySelector("b").textContent;
     allBtn.setAttribute("aria-pressed", String(showAll));
-    allBtn.textContent = showAll ? "Show one series" : "Show all 11";
+    allBtn.textContent = showAll ? tr("Show one series") : tr("Show all 11");
   }
   series.forEach((b) => b.addEventListener("click", () => {
     cur = b.dataset.series; showAll = false; press(series, b);
@@ -45,6 +47,7 @@
     renderPosts();
   }));
   if (allBtn) { allBtn.addEventListener("click", () => { showAll = !showAll; renderPosts(); }); renderPosts(); }
+  document.addEventListener("langchange", () => { numberPosts(); if (allBtn) renderPosts(); const on = document.querySelector("[data-env][aria-pressed=true]"); if (on) $("#rlCap").textContent = tr(ENV[on.dataset.env]); });
 
   /* ---------- projects filter ---------- */
   const pfb = $$("[data-pf]"), cards = $$("#projGrid .proj");
@@ -65,7 +68,7 @@
     const e = b.dataset.env;
     rlVid.poster = `assets/media/rl_${e}.jpg`;
     rlVid.src = `assets/media/rl_${e}.mp4`;
-    $("#rlCap").textContent = ENV[e];
+    $("#rlCap").textContent = tr(ENV[e]);
     if (!reduced) play(rlVid);
   }));
 
@@ -113,7 +116,7 @@
       const k = Math.min((now - t0) / 450, 1), e = 1 - Math.pow(1 - k, 3), [xa, ya] = P(from), [xb, yb] = P(user);
       ctx.fillStyle = rgb(a); ctx.beginPath(); ctx.arc(xa + (xb - xa) * e, ya + (yb - ya) * e, 6, 0, 7); ctx.fill();
       ctx.font = "600 10px 'JetBrains Mono', monospace"; ctx.fillStyle = rgb(ink, 0.7);
-      ctx.textAlign = "right"; ctx.fillText("● cached content", W - 10, H - 12); ctx.textAlign = "left";
+      ctx.textAlign = "right"; ctx.fillText(tr("● cached content"), W - 10, H - 12); ctx.textAlign = "left";
     }
     function rgbToHex(str) { const m = str.match(/\d+/g) || [255, 255, 255]; return "#" + m.slice(0, 3).map((v) => (+v).toString(16).padStart(2, "0")).join(""); }
     let last = 0;
@@ -172,7 +175,7 @@
         S.forEach((p, i) => { const [x, y] = tx(p); ctx.fillStyle = rgb(c); ctx.beginPath(); ctx.arc(x, y, i === drag && S === P ? 8 : 5.5, 0, 7); ctx.fill(); });
       });
       ctx.font = "600 11px 'JetBrains Mono', monospace";
-      ctx.fillStyle = rgb(A); ctx.fillText("native", 10, 18); ctx.fillStyle = rgb(T); ctx.fillText("prediction", 70, 18);
+      ctx.fillStyle = rgb(A); ctx.fillText(tr("native"), 10, 18); ctx.fillStyle = rgb(T); ctx.fillText(tr("prediction"), 70, 18);
       $("#supRmsd").textContent = rmsd(P).toFixed(1) + " Å";
       if (anim) { if (performance.now() - anim.t0 >= 900) { pred = transformed(pred, anim.th, anim.ca, anim.cb, 1); anim = null; update(); } else requestAnimationFrame(update); }
     }
@@ -197,6 +200,7 @@
     new ResizeObserver(size).observe(sc);
     new MutationObserver(update).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     newPred();
+    document.addEventListener("langchange", update);
   }
 
   /* ---------- publications: sort by year or citations ---------- */

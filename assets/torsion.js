@@ -4,6 +4,7 @@
   if (!D || !root) return;
   const $ = (s) => root.querySelector(s), $$ = (s) => Array.from(root.querySelectorAll(s));
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const T = (s) => (window.I18N ? window.I18N.t(s) : s);
   const cv = $("#tlCanvas"), ctx = cv.getContext("2d"), pf = $("#tlProfile"), pctx = pf.getContext("2d");
 
   const BB = ["P", "O5'", "C5'", "C4'", "C3'", "O3'"];
@@ -155,14 +156,14 @@
   const angleAt = (coords, t, r) => { const q = quad(t, r); return q ? dihedral(...q.map((i) => coords[i])) : null; };
   const resLabel = (r) => (src === "trna" ? D.seq[r] + D.num[r] : "nt " + (r + 1));
   function updateValue() {
-    $("#tlDef").innerHTML = `<b>${sel}</b> = ${DEF[sel].join(" – ")}` + (PSEUDO.has(sel) ? " <span class=\"muted\">(pseudo-torsion, coarse-grained)</span>" : "");
+    $("#tlDef").innerHTML = `<b>${sel}</b> = ${DEF[sel].join(" – ")}` + (PSEUDO.has(sel) ? ` <span class="muted">${T("(pseudo-torsion, coarse-grained)")}</span>` : "");
     const a = angleAt(X, sel, hiRes), b = angleAt(ref, sel, hiRes);
-    $("#tlValue").innerHTML = a == null ? `${resLabel(hiRes)}: undefined at the chain end`
-      : `${resLabel(hiRes)}: <b>${a.toFixed(0)}°</b> rebuilt · ${b.toFixed(0)}° ${src === "trna" ? "in the crystal" : "ideal"}`;
+    $("#tlValue").innerHTML = a == null ? `${resLabel(hiRes)}: ${T("undefined at the chain end")}`
+      : `${resLabel(hiRes)}: <b>${a.toFixed(0)}°</b> ${T("rebuilt")} · ${b.toFixed(0)}° ${src === "trna" ? T("in the crystal") : T("ideal")}`;
     const off = $("#tlOffset");
     off.disabled = PSEUDO.has(sel);
     off.value = PSEUDO.has(sel) ? 0 : offsets[sel];
-    $("#tlOffsetVal").textContent = PSEUDO.has(sel) ? "derived" : (offsets[sel] > 0 ? "+" : "") + offsets[sel] + "°";
+    $("#tlOffsetVal").textContent = PSEUDO.has(sel) ? T("derived") : (offsets[sel] > 0 ? "+" : "") + offsets[sel] + "°";
   }
 
   // 3D view
@@ -310,10 +311,11 @@
     $("#tlNoise").value = 0; $("#tlNoiseVal").textContent = "σ = 0°"; recompute(); kick();
   });
   $("#tlBuild").addEventListener("click", () => { if (reduced) return; buildAnim = performance.now(); buildK = 3; kick(); });
-  $("#tlSpin").addEventListener("click", (e) => { spin = !spin; e.target.setAttribute("aria-pressed", String(spin)); e.target.textContent = spin ? "Pause spin" : "Spin"; kick(); });
+  $("#tlSpin").addEventListener("click", (e) => { spin = !spin; e.target.setAttribute("aria-pressed", String(spin)); e.target.textContent = spin ? T("Pause spin") : T("Spin"); kick(); });
 
   new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColors);
   reseed(); readColors(); setSource("trna");
+  document.addEventListener("langchange", () => { updateValue(); const b = $("#tlSpin"); b.textContent = spin ? T("Pause spin") : T("Spin"); });
   window.RNAGeom = { superpose }; // shared with the frame reconstruction demo
 })();
