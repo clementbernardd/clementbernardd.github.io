@@ -92,7 +92,7 @@
 
   // rotating word in the lede
   const rot = $("#rot");
-  const words = ["engineering", "AI", "machine learning", "data"];
+  const words = ["biology", "RNA folding", "gene synthesis"];
   if (!reduced) {
     let wi = 0;
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -246,17 +246,15 @@
     try { navigator.clipboard.writeText(em.textContent).then(done, fallback); } catch (e) { fallback(); }
   });
 
-  // local time (about card + footer) and year
-  const tEls = [$("#time"), $("#localTime")];
+  // local time (footer) and year
   const tick = () => {
     try {
       const s = new Date().toLocaleTimeString("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit" });
-      tEls[0].textContent = "Paris · " + s;
-      tEls[1].textContent = T("{t} in Paris").replace("{t}", s);
+      $("#time").textContent = "Paris · " + s;
     } catch (e) {}
   };
   tick(); setInterval(tick, 30000);
-  document.addEventListener("langchange", () => { tick(); rot.textContent = T(words[0]); });
+  document.addEventListener("langchange", () => { rot.textContent = T(words[0]); });
   $("#year").textContent = new Date().getFullYear();
 
   console.log("%c ATGC %c Thanks for looking under the hood.", "background:#13152B;color:#FFB800;font-weight:bold;padding:2px 6px;border-radius:4px", "color:inherit");

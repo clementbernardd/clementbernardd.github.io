@@ -338,13 +338,16 @@
   function pause() { playing = false; syncDom(); }
   function toResult() { if (tl < T_END || playing) { playing = false; tl = T_END; camR = maxR; } }
   function seek(t) { tl = Math.min(Math.max(t, 0), T_END); camR = maxR; syncDom(); dirty = true; kick(); }
-  let autoplayed = false;
+  let autoplayed = false, autoPaused = false;
   new IntersectionObserver(([en]) => {
     visible = en.isIntersecting;
-    if (en.intersectionRatio >= 0.55 && !autoplayed) { autoplayed = true; play(0, true); }
-    if (!en.isIntersecting && playing) pause(); // don't run unseen; resume with Play
+    if (en.intersectionRatio >= 0.3) {
+      if (!autoplayed) { autoplayed = true; play(0, true); }
+      else if (autoPaused) { autoPaused = false; play(); } // resume where it stopped when scrolled away
+    }
+    if (!en.isIntersecting && playing) { autoPaused = true; pause(); } // don't run unseen
     kick();
-  }, { threshold: [0, 0.55] }).observe(cv);
+  }, { threshold: [0, 0.3] }).observe(cv);
 
   cv.addEventListener("pointerdown", (e) => { cv.setPointerCapture(e.pointerId); drag = true; last = [e.clientX, e.clientY]; });
   cv.addEventListener("pointermove", (e) => { if (!drag) return; V = mm(rot((e.clientY - last[1]) * 0.01, (e.clientX - last[0]) * 0.01), V); last = [e.clientX, e.clientY]; dirty = true; kick(); });
@@ -362,7 +365,7 @@
 
   // ---------- controls ----------
   const press = (group, b) => group.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-  playB.addEventListener("click", () => (playing ? pause() : play()));
+  playB.addEventListener("click", () => { autoPaused = false; playing ? pause() : play(); });
   scrub.addEventListener("input", () => { const t = (scrub.value / 1000) * T_END; playing = false; seek(t); }); // read before syncDom rewrites the slider
   stepEls.forEach((el) => {
     const go = () => { const k = +el.dataset.step - 1; play(START[k]); };

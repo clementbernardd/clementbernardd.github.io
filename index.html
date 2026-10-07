@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
-<link rel="stylesheet" href="assets/style.css?v=f7931cef">
+<link rel="stylesheet" href="assets/style.css?v=1b19a208">
 </head>
 <body>
 <a class="skip" href="#about">Skip to content</a>
@@ -34,7 +34,6 @@
         <li><a href="#experience">Experience</a></li>
         <li><a href="#education">Education</a></li>
         <li><a href="#thesis">Thesis</a></li>
-        <li><a href="#ai">AI lab</a></li>
         <li><a href="#research">Research</a></li>
         <li><a href="#tutorials">Tutorials</a></li>
         <li><a href="#skills">Skills</a></li>
@@ -57,7 +56,7 @@
   <header class="hero" id="hero">
     <div class="eyebrow"><span class="dot" aria-hidden="true"></span>Paris, France · AI Engineer at DNA Script</div>
     <h1>Clement<span class="l2">Bernard<span class="acc">.</span></span></h1>
-    <p class="lede">I work where <mark>biology meets <span id="rot">engineering</span><span class="caret" aria-hidden="true"></span></mark>: a PhD on predicting RNA 3D structures with deep learning, and now AI for DNA synthesis.</p>
+    <p class="lede">An engineer in <b>AI and data science</b> by training, I now apply it to biological data. I work where <mark>data meets <span id="rot">biology</span><span class="caret" aria-hidden="true"></span></mark>: a PhD on predicting RNA 3D structures with deep learning, and now AI for DNA synthesis.</p>
     <div class="ctas">
       <a class="btn solid" href="#experience">See my experience <span class="arr">→</span></a>
       <a class="btn" href="#contact">Get in touch</a>
@@ -80,14 +79,13 @@
       <div class="reveal">
         <p>I like problems that sit between disciplines: part machine learning, part biology.</p>
         <p>Since November 2025 I’ve been an AI Engineer at DNA Script, working on an oligo design tool for DNA synthesis, database architecture and data science pipelines for gene synthesis. Before that I did a PhD in AI applied to biology at Université Paris-Saclay, building deep learning methods to predict RNA 3D structures from the sequence, with a research stay at Poznan University of Technology.</p>
-        <p>I trained as an engineer in data science at Télécom Paris, EURECOM and Polytechnique Montréal. Along the way I worked on NLP, reinforcement learning and computer vision, and I once spent a summer working at a dog resort near Mount Fuji.</p>
+        <p>I trained as an engineer in data science at Télécom Paris, EURECOM and Polytechnique Montréal. Along the way I worked on NLP, reinforcement learning and computer vision.</p>
       </div>
       <dl class="facts reveal" style="--d:.1s">
         <div><dt>Based in</dt><dd>Paris, France</dd></div>
         <div><dt>Currently</dt><dd>AI Engineer · DNA Script</dd></div>
         <div><dt>Focus</dt><dd>Deep learning · RNA · DNA synthesis</dd></div>
         <div><dt>Languages</dt><dd>French, English, some Japanese</dd></div>
-        <div><dt>Local time</dt><dd id="localTime">Paris</dd></div>
       </dl>
     </div>
   </section>
@@ -576,9 +574,11 @@
           <p class="fine">Simplified demo on the tRNA (PDB 1EHZ). The frames come from the crystal structure rather than from the model. The all-atom step places a rigid, averaged nucleotide on each frame instead of running Arena, so the ranking of representations here differs from the thesis. The pLDDT head learns to predict lDDT; here the true per-nucleotide lDDT (on C4′) is shown instead. Rotation errors barely move the frame origins, so TM-score stays high while base pairs break and INF drops. Translation errors hurt every metric.</p>
         </div>
 
-        <div class="modchart reveal" id="modChart">
+        <details class="mc-details reveal">
+          <summary><span class="mc-q">Which representation loses the least?</span><span class="mc-open">Show comparison</span><span class="mc-close">Hide comparison</span></summary>
+        <div class="modchart" id="modChart">
           <div class="mc-head">
-            <div><h4>Which representation loses the least?</h4><p>Structures rebuilt from the <i>true</i> values of each modality, then converted to all-atom with Arena, on RNA-Puzzles, CASP-RNA and RNASolo (thesis Table 6.2, mean ± s.d.).</p></div>
+            <div><p>Structures rebuilt from the <i>true</i> values of each modality, then converted to all-atom with Arena, on RNA-Puzzles, CASP-RNA and RNASolo (thesis Table 6.2, mean ± s.d.).</p></div>
             <div class="mc-ctl">
               <div class="seg" role="group" aria-label="Metric">
                 <button type="button" data-mc="rmsd" aria-pressed="true">RMSD</button><button type="button" data-mc="inf" aria-pressed="false">INF</button><button type="button" data-mc="tm" aria-pressed="false">TM-score</button><button type="button" data-mc="mcq" aria-pressed="false">MCQ</button><button type="button" data-mc="clash" aria-pressed="false">Clash</button>
@@ -591,97 +591,13 @@
           <div class="mc-table-wrap"><table class="mc-table" hidden></table></div>
           <p class="fine">Frames give the best RMSD, INF, TM-score and clash score. Torsion angles (with true bond angles) keep local geometry better (MCQ) but struggle with multi-stranded RNAs. Among frame representations, NuFold (O4′, C1′, C2′, N) scored best, followed by Custom reduced, though the differences were not significant.</p>
         </div>
+        </details>
 
         <div class="status-card reveal">
           <span class="badge pre">STATUS</span>
           <p><b>Work in progress.</b> Trained on 1,005 structures (RNASolo + RNA3DB split) and 15,198 filtered synthetic structures (RFdiffusion, ranked with N-META), the model overfits a single structure but does not yet generalise: validation TM-scores stayed below 0.2 and predictions tend towards helix-like shapes. The reconstruction study above holds independently of this, and the model remains a sequence-only, MSA-free starting point.</p>
         </div>
       </article>
-    </div>
-  </section>
-
-  <section class="block" id="ai">
-    <div class="sec-head reveal"><span class="tag" style="background:var(--fg);color:var(--bg);font-size:.75rem">AI</span><h2>AI playground</h2><p class="sec-sub">Much of my work has been in AI: fact-checking with text generation models at BusterAI, deep reinforcement learning for recommendation at Oscaro, and language models for RNA during my PhD. Here are two small demos of the core ideas, both running live in your browser.</p></div>
-    <div class="ai-lab reveal" id="aiLab">
-      <div class="tabs" role="tablist" aria-label="AI demos">
-        <button type="button" role="tab" id="tabNlp" data-tab="nlp" aria-controls="panelNlp" aria-selected="true"><span>NLP</span> Self-attention</button>
-        <button type="button" role="tab" id="tabRl" data-tab="rl" aria-controls="panelRl" aria-selected="false" tabindex="-1"><span>RL</span> Q-learning agent</button>
-      </div>
-
-      <div class="panel" role="tabpanel" id="panelNlp" aria-labelledby="tabNlp">
-        <p class="panel-lede">Transformers read text by letting every token <em>attend</em> to every other token. Type a sentence, then hover over a token on the left to see where it looks.</p>
-        <input class="search" id="attnInput" type="text" value="RNA folds into complex three-dimensional shapes." aria-label="Sentence to analyse" maxlength="120" spellcheck="false">
-        <div class="examples">
-          <span class="ctl-k">Try</span>
-          <button type="button" class="chip-btn" data-example="The agent learns which action leads to the goal.">RL sentence</button>
-          <button type="button" class="chip-btn" data-example="Attention is all you need, they said.">Famous paper</button>
-          <button type="button" class="chip-btn" data-example="Le modèle lit la séquence, puis prédit la structure.">En français</button>
-        </div>
-        <div class="seg heads" role="group" aria-label="Attention head">
-          <button type="button" data-head="0" aria-pressed="true">Head 1 · local</button>
-          <button type="button" data-head="1" aria-pressed="false">Head 2 · similar</button>
-          <button type="button" data-head="2" aria-pressed="false">Head 3 · previous</button>
-          <button type="button" data-head="3" aria-pressed="false">Head 4 · summary</button>
-          <button type="button" data-head="4" aria-pressed="false">Mean</button>
-        </div>
-        <div class="attn-grid">
-          <div class="attn">
-            <div class="attn-col" id="attnQ" aria-label="Query tokens"></div>
-            <svg id="attnSvg" aria-hidden="true"></svg>
-            <div class="attn-col k" id="attnK" aria-hidden="true"></div>
-          </div>
-          <div class="attn-side">
-            <span class="ctl-k">Attention matrix (rows: queries)</span>
-            <div class="attn-matrix" id="attnMatrix" aria-hidden="true"></div>
-          </div>
-        </div>
-        <p class="attn-info" id="attnHeadInfo" aria-live="polite"></p>
-        <p class="fine">Toy model: each head uses a hand-written scoring rule over hashed character trigrams and positions, followed by a real softmax. No trained weights involved.</p>
-      </div>
-
-      <div class="panel" role="tabpanel" id="panelRl" aria-labelledby="tabRl" hidden>
-        <p class="panel-lede">An agent starts out knowing nothing. It explores, gets rewarded at the <b>goal</b>, punished in the <b class="lava-t">lava</b>, and updates a Q-table after every step. Press <b>Train</b> and watch the arrows (its policy) appear. Then draw new walls and see it adapt.</p>
-        <div class="rl-grid">
-          <div class="rl-board"><canvas id="rlCanvas" aria-label="Gridworld. Click or drag to draw with the selected tool."></canvas></div>
-          <div class="rl-side">
-            <div class="ctl row">
-              <button class="btn solid sm" type="button" id="rlRun" aria-pressed="false">Train</button>
-              <button class="btn sm" type="button" id="rlGreedy">Run best policy</button>
-            </div>
-            <div class="ctl">
-              <span class="ctl-k">Speed</span>
-              <div class="seg">
-                <button type="button" data-speed="1" aria-pressed="true">Watch</button>
-                <button type="button" data-speed="2" aria-pressed="false">Fast</button>
-                <button type="button" data-speed="3" aria-pressed="false">Turbo</button>
-              </div>
-            </div>
-            <div class="ctl">
-              <span class="ctl-k">Draw</span>
-              <div class="seg">
-                <button type="button" data-tool="wall" aria-pressed="true">Wall</button>
-                <button type="button" data-tool="lava" aria-pressed="false">Lava</button>
-                <button type="button" data-tool="goal" aria-pressed="false">Goal</button>
-                <button type="button" data-tool="start" aria-pressed="false">Start</button>
-              </div>
-            </div>
-            <div class="readouts four">
-              <div><b id="rlEp">0</b><span>episodes</span></div>
-              <div><b id="rlEps">1.00</b><span>ε (exploration)</span></div>
-              <div><b id="rlLast">–</b><span>steps, last episode</span></div>
-              <div><b id="rlRate">–</b><span>success, last 20</span></div>
-            </div>
-            <div class="ctl"><span class="ctl-k">Steps per episode</span><canvas id="rlSpark" class="spark" aria-hidden="true"></canvas></div>
-            <p class="rl-msg" id="rlMsg" aria-live="polite"></p>
-            <div class="ctl row">
-              <button class="chip-btn" type="button" id="rlReset">Wipe memory</button>
-              <button class="chip-btn" type="button" id="rlMap">Reset map</button>
-            </div>
-            <p class="fine">Tabular Q-learning: α = 0.5, γ = 0.95, ε-greedy exploration decaying from 1 to 0.05. Green cells mean the agent expects reward there.</p>
-            <p class="fine">I’ve also applied RL to <a class="link" href="#projects">exploration bonuses and cache-friendly recommendation</a>.</p>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -703,7 +619,7 @@
           <button type="button" data-f="method" aria-pressed="false">Methods</button>
           <button type="button" data-f="benchmark" aria-pressed="false">Benchmarks</button>
           <button type="button" data-f="tool" aria-pressed="false">Tools</button>
-          <button type="button" data-f="other" aria-pressed="false">Thesis &amp; preprint</button>
+          <button type="button" data-f="other" aria-pressed="false">Thesis</button>
           <span class="count" id="pubCount" aria-live="polite"></span>
         </div>
         <div class="sortrow"><span class="ctl-k">Sort by</span><div class="seg"><button type="button" data-sort="y" aria-pressed="true">Year</button><button type="button" data-sort="c" aria-pressed="false">Citations</button></div></div>
@@ -712,7 +628,6 @@
           <li class="pub" data-t="other" data-y="2025.8" data-c="0"><span class="y">2025</span><div><p class="ttl">Computational methods based on deep learning for the prediction of RNA 3D structures</p><div class="au"><strong>Bernard C.</strong></div><div class="meta"><span class="badge thesis">PHD THESIS</span><span class="venue">Université Paris-Saclay</span><a href="#thesis">Explore ↑</a></div></div></li>
           <li class="pub" data-t="benchmark" data-y="2025.2" data-c="76"><span class="y">2025</span><div><p class="ttl">Has AlphaFold3 achieved success for RNA?</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge conf">BENCHMARK</span><span class="venue">Acta Crystallographica Section D 81(2), 49–62</span><span>· 76 citations</span><a href="https://doi.org/10.1107/S2059798325000592" target="_blank" rel="noopener">DOI ↗</a><a href="#af3">More ↑</a></div></div></li>
           <li class="pub" data-t="method" data-y="2025.1" data-c="18"><span class="y">2025</span><div><p class="ttl">RNA-TorsionBERT: leveraging language models for RNA 3D torsion angles prediction</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge journal">METHOD</span><span class="venue">Bioinformatics 41(1), btaf004</span><span>· 18 citations</span><a href="https://doi.org/10.1093/bioinformatics/btaf004" target="_blank" rel="noopener">DOI ↗</a><a href="#torsionbert">Demo ↑</a></div></div></li>
-          <li class="pub" data-t="other" data-y="2024.5" data-c="9"><span class="y">2024</span><div><p class="ttl">Has AlphaFold 3 reached its success for RNAs?</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge pre">PREPRINT</span><span class="venue">bioRxiv</span><span>· 9 citations</span><a href="https://www.biorxiv.org/content/10.1101/2024.06.13.598780v2" target="_blank" rel="noopener">bioRxiv ↗</a></div></div></li>
           <li class="pub" data-t="benchmark" data-y="2024.4" data-c="53"><span class="y">2024</span><div><p class="ttl">State-of-the-RNArt: benchmarking current methods for RNA 3D structure prediction</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge conf">BENCHMARK</span><span class="venue">NAR Genomics and Bioinformatics 6(2), lqae048</span><span>· 53 citations</span><a href="https://doi.org/10.1093/nargab/lqae048" target="_blank" rel="noopener">DOI ↗</a><a href="#sotr">More ↑</a></div></div></li>
           <li class="pub" data-t="tool" data-y="2024.2" data-c="17"><span class="y">2024</span><div><p class="ttl">RNAdvisor: a comprehensive benchmarking tool for the measure and prediction of RNA structural model quality</p><div class="au"><strong>Bernard C.</strong>, Postic G., Ghannay S., Tahi F.</div><div class="meta"><span class="badge preprint">TOOL</span><span class="venue">Briefings in Bioinformatics 25(2), bbae064</span><span>· 17 citations</span><a href="https://doi.org/10.1093/bib/bbae064" target="_blank" rel="noopener">DOI ↗</a></div></div></li>
         </ul>
@@ -861,7 +776,7 @@
         <figure class="media nf-media"><canvas id="nfCanvas" aria-label="Animation: a user moves between content items, cached items are highlighted"></canvas>
           <div class="envs" role="group" aria-label="Recommendation policy"><button type="button" data-nf="rl" aria-pressed="true">Cache-aware policy</button><button type="button" data-nf="random" aria-pressed="false">Random</button></div>
           <figcaption class="env-cap">Cache hit rate <b id="nfRate">–</b></figcaption></figure>
-        <span class="k">RL · EURECOM semester project · with Jade Bonnet</span><h3>Network-friendly recommendations</h3>
+        <span class="k">RL · EURECOM semester project</span><h3>Network-friendly recommendations</h3>
         <p>Recommend content the user will enjoy and that is already cached nearby. Solved with Q-learning for a Markovian user, then with Deep Q-learning and Double Q-learning in PyTorch.</p>
         <div class="proj-links"><a class="go" href="https://github.com/clementbernardd/network_friendly" target="_blank" rel="noopener">GitHub <span class="arr">→</span></a></div>
       </article>
@@ -894,9 +809,9 @@
       <span class="addr" id="email">clementbernardd@gmail.com</span>
       <button class="btn solid" type="button" id="copyBtn">Copy email</button>
       <a class="btn" href="mailto:clementbernardd@gmail.com">Write to me ↗</a>
+      <a class="btn" href="https://www.linkedin.com/in/clementbernard" target="_blank" rel="noopener">LinkedIn ↗</a>
       <a class="btn" href="https://github.com/clementbernardd" target="_blank" rel="noopener">GitHub ↗</a>
       <a class="btn" href="https://scholar.google.com/citations?user=hvGvUwgAAAAJ&amp;hl=fr" target="_blank" rel="noopener">Scholar ↗</a>
-      <!-- LinkedIn: add <a class="btn" href="https://www.linkedin.com/in/…" target="_blank" rel="noopener">LinkedIn ↗</a> once the profile URL is known -->
     </div>
   </section>
 
@@ -912,16 +827,15 @@
 <dialog class="lightbox" id="lightbox" aria-label="Figure"><button class="icon-btn lb-close" type="button" aria-label="Close">✕</button><img alt=""></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="assets/i18n-fr.js?v=fc7a03ef" defer></script>
+<script src="assets/i18n-fr.js?v=b6b9cec0" defer></script>
 <script src="assets/i18n.js?v=d6e2e0c0" defer></script>
-<script src="assets/main.js?v=62552b87" defer></script>
+<script src="assets/main.js?v=1dd51af5" defer></script>
 <script src="assets/rna-data.js?v=4833b33e" defer></script>
 <script src="assets/rna3d.js?v=0a6b635d" defer></script>
-<script src="assets/ai.js?v=5158eaaf" defer></script>
 <script src="assets/torsion-data.js?v=dc794902" defer></script>
 <script src="assets/torsion.js?v=f676d5c9" defer></script>
 <script src="assets/frames-data.js?v=dc44467d" defer></script>
-<script src="assets/frames.js?v=e1316ae9" defer></script>
+<script src="assets/frames.js?v=e4dc4f5e" defer></script>
 <script src="assets/works.js?v=5fb8beac" defer></script>
 <script src="assets/af3-data.js?v=be147d58" defer></script>
 <script src="assets/af3.js?v=71347a0c" defer></script>
